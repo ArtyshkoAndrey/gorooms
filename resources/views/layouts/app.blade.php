@@ -715,7 +715,7 @@
         .then(response => response.json())
         .then(response => {
           if (response.success) {
-            form.querySelectorAll('button[type=submit]')[0].innerText = 'Показать (' + response.payload.count + ')';
+            form.querySelectorAll('button[type=submit]')[0].innerText = 'Показать (' + response.payload.count + ') ' + (response.payload.is_room == true ? 'номеров' : 'отелей');
           }
         });
     });

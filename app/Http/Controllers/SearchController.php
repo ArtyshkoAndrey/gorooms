@@ -188,6 +188,7 @@ class SearchController extends Controller
     }
 
     $count = $is_room ? $rooms->count() : $hotels->count();
+
     $title = $with_map ? 'Поиск по карте' : "Результаты поиска <span class=\"count\">($count)</span>";
 
     try {
@@ -201,7 +202,7 @@ class SearchController extends Controller
     }
 
     if ($request->is('api/*'))
-      return Json::good(['count' => $count]);
+      return Json::good(['count' => $count, "is_room" => $is_room]);
 
     /* START SEO */
 
