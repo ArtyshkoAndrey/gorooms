@@ -767,3 +767,16 @@ function changeForm() {
         element.fireEvent("onchange");
     }
 }
+
+function search_reset() {
+    $("#js-advanced-search textarea, #js-advanced-search input[type='text']").val("");
+    $("#js-advanced-search input, #js-advanced-search textarea").trigger("refresh");
+
+    $("#js-advanced-search input[type='checkbox']").prop("checked", false);
+    $("#js-advanced-search input[type='checkbox']").trigger("refresh");
+
+    $("#js-advanced-search select").prop("selectedIndex", 0);
+    $("#js-advanced-search select").trigger("refresh");
+
+    $("label[for='advanced-search-prices-1']").trigger("click");
+}

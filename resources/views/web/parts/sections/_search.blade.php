@@ -249,7 +249,7 @@
             <button class="advanced-search-ico-btn advanced-search-ico-btn-favorite" type="button"></button>
             <a href="{{ route('search.map') }}" class="advanced-search-ico-btn advanced-search-ico-btn-map"
                type="button"></a>
-            <button type="reset" class="advanced-search-reset-btn">Очистить поиск</button>
+            <button  onclick="event.preventDefault();search_reset();" class="advanced-search-reset-btn">Очистить поиск</button>
             <button class="btn btn-blue" type="submit">Показать</button>
         </div>
         <button id="js-advanced-search-close-btn" type="button"
