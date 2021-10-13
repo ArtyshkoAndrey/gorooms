@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * App\Models\Search
@@ -46,6 +47,7 @@ class Search extends Model
   public static function getBySlug(&$slugs)
   {
     $hotels = static::getBySlugQuery($slugs);
+
     return $hotels->get();
   }
 
@@ -54,6 +56,7 @@ class Search extends Model
     $addresses = DB::table('address_slug')
       ->whereIn('slug', array_values($slugs))
       ->get();
+
     $hotels = Hotel::with(['rooms', 'address']);
     $filter = [];
     foreach ($addresses as $address) {
@@ -73,10 +76,6 @@ class Search extends Model
         $filter['street'] = $address->address;
         $slugs['street'] = $address->address;
       }
-      if (isset($slugs['metro']) && $slugs['metro'] === $address->slug) {
-        $filter['metro'] = $address->address;
-        $slugs['metro'] = $address->address;
-      }
     }
 
     $hotels->whereHas('address', function ($builder) use ($filter) {
@@ -84,11 +83,30 @@ class Search extends Model
         if ($col !== 'metro')
           $builder->where($col, $value);
     });
-    if (array_key_exists('metro', $filter)) {
-      $hotels->whereHas('metros', function ($builder) use ($filter) {
-        $builder->where('name', $filter['metro']);
-      });
+
+    if (array_key_exists('metro', $slugs)) 
+    {
+      $metros = DB::table('metros')->get();
+
+      $metro_found = false;
+
+      foreach($metros as $metro) {
+        if($slugs['metro'] == trim(Str::slug($metro->name))) 
+        {
+          $hotels->whereHas('metros', function ($builder) use ($metro) {
+            $builder->where('name', $metro->name);
+          });
+
+          $slugs['metro'] = $metro->name;
+          $metro_found = true;
+        }
+      }
+
+      if($metro_found == false) {
+        $hotels->where("id", 0); // if metro non exist query should fail
+      }
     }
+
     return $hotels;
   }
 

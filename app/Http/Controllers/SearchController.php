@@ -488,7 +488,6 @@ class SearchController extends Controller
 
   public function address(Request $request, $city, $param1 = null, $param2 = null, $param3 = null, $param4 = null)
   {
-
     $slugs = [];
 
     $findParam = function ($param) use ($param1, $param2, $param3, $param4) {
@@ -521,8 +520,9 @@ class SearchController extends Controller
       $slugs[$slug] = $content;
     }
     $hotels = Search::getBySlug($slugs);
+
     $query = '';
-    // $rooms = Room::whereIn('hotel_id', $hotels->pluck('id')->toArray())->get();
+
     $rooms = Room::whereIn('hotel_id', $hotels->pluck('id')->toArray())->paginate(20);
     $with_map = false;
     $title = 'Отели города ';
@@ -534,8 +534,8 @@ class SearchController extends Controller
         . (isset($slugs['metro']) ? ', метро "' . $slugs['metro'] . '"' : '');
 
     }
-//        $title .= '"';
-    // dd($title);
+
+    
     $attributes = [
       'hotel' => [],
       'room' => [],
