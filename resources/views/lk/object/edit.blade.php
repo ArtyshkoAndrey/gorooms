@@ -719,18 +719,6 @@
 
     $("input[type='phone']").mask("+7 (999) 999 99-99");
 
-    ClassicEditor
-      .create(document.querySelector('#editor'))
-      .catch(error => {
-        console.error(error);
-      });
-
-    ClassicEditor
-      .create(document.querySelector('#editor2'))
-      .catch(error => {
-        console.error(error);
-      });
-
     $(document).ready(function () {
       $('.sortable').sortable({
         items: '.dz-image-preview',

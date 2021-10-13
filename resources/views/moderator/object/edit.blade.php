@@ -491,18 +491,6 @@
       type: "ADDRESS",
     });
 
-    ClassicEditor
-      .create(document.querySelector('#editor'))
-      .catch(error => {
-        console.error(error);
-      });
-
-    ClassicEditor
-      .create(document.querySelector('#editor2'))
-      .catch(error => {
-        console.error(error);
-      });
-
     function selectInit() {
       $('.metros').select2({
         placeholder: "Название станции",
