@@ -584,7 +584,9 @@ function SearchFilters() {
             let district = '';
             let metro = '';
             let type = '';
-            if(dataUrl.length > 0) {
+
+            
+            if (dataUrl.length > 0) {
                 for(const item of dataUrl) {
                     if(item['name'] === 'address[city_area]') {
                         area = item['value'].replace('+', ' ');
@@ -611,8 +613,49 @@ function SearchFilters() {
                 await districtInit();
                 await changeForm();
                 await fn();
+            } else if (typeof SearchData != 'undefinded') {
+                if (SearchData["city"] != '') {
+                    city = SearchData["city"];
+                }
+                if (SearchData["district"] != "") {
+                  district = SearchData["district"];
+                }
+                if (SearchData["metro"] != "") {
+                  metro = SearchData["metro"];
+                }
+                if (SearchData["area"] != "") {
+                  area = SearchData["area"];
+                }
+                
+                await selectMetro
+                  .find(`option[value="${metro}"]`)
+                  .prop("selected", true)
+                  .trigger("change")
+                  .trigger("refresh");
+                await selectType
+                  .find(`option[value="${type}"]`)
+                  .prop("selected", true)
+                  .trigger("change")
+                  .trigger("refresh");
+                await selectArea
+                  .find(`option[value="${area}"]`)
+                  .prop("selected", true)
+                  .trigger("change")
+                  .trigger("refresh");
+                const districtInit = () => {
+                  if (selectDistrict.find(`option[value="${district}"]`)) {
+                    selectDistrict
+                      .find(`option[value="${district}"]`)
+                      .prop("selected", true)
+                      .trigger("change")
+                      .trigger("refresh");
+                  }
+                };
+                await districtInit();
+                await changeForm();
+                await fn();
             } else {
-                fn()
+              fn();
             }
         }
     };
@@ -658,6 +701,7 @@ function SearchFilters() {
     }
 
     this.loadArea = async function (data) {
+        console.log(data);
         const select = this.containers.area.select;
         this.clearSelect(select);
         let uniqueArea = new Set(

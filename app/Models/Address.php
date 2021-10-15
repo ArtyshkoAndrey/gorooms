@@ -135,7 +135,7 @@ class Address extends Model
 
   public function hotel(): BelongsTo
   {
-    return $this->belongsTo(Hotel::class);
+    return $this->belongsTo(Hotel::class, 'hotel_id');
   }
 
   public function getCityAreaShortAttribute()

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Settings;
 use App\Models\Room;
-use App\Helpers\Json;
+use App\Helpers\{Json, Area};
 use App\Models\Hotel;
 use App\Models\Search;
 use App\Models\Attribute;
@@ -540,7 +540,13 @@ class SearchController extends Controller
       'hotel' => [],
       'room' => [],
     ];
-    $address = ['city' => '', 'area' => '', 'region' => ''];
+
+    $address = $slugs;
+
+    if(isset($address['area']) && $address['area']) {
+      $address['short_area'] = Area::short($address['area']);
+    }
+
     return view(isset($request["page"]) ? 'web.search_' : 'web.search', compact('hotels', 'query', 'rooms', 'with_map', 'title', 'attributes', 'address', 'request'));
   }
 }

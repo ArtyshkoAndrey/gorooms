@@ -25,9 +25,10 @@ class AddressController extends Controller
                 $address->where('street', $street);
 
             $hotels = $address->get()->map(function($item){
-                return $item->hotel->id;
+                return $item->hotel ? $item->hotel->id : 0;
             });
             $collection = $this->modifyCollection($address->get());
+         
             $metros = Metro::select('name')
                 ->whereIn('hotel_id', $hotels)
                 ->groupBy('name')

@@ -1,4 +1,15 @@
 <form action="{{ $search_link ?? route('search') }}" id="js-advanced-search" class="advanced-search" method="GET">
+    @if(@isset($address))
+        <script>
+            var SearchData = {
+                "city": "{{ @$address['city'] ?? @$current_city ?? '' }}",
+                "metro": "{{ @$address['metro'] ?? '' }}",
+                "area": "{{ @$address['area'] ?? '' }}",
+                "short_area": "{{ @$address['short_area'] ?? '' }}",
+                "district": "{{ @$address['district'] ?? '' }}",
+            }
+        </script>
+    @endif
     <div id="js-advanced-search-in" class="advanced-search-in">
         <div class="container">
             <div class="search-form-group">
