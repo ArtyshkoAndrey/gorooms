@@ -135,7 +135,7 @@ use App\Models\Hotel;
                   @endif {{ $hotel->address->comment ? ', '.$hotel->address->comment : '' }}
                                 <span>
               </p>
-              <div class="block-desktop">
+              <div class="block-desktop metro-rwd">
                 <ul class="room-metro">
                   @if ($hotel->metros()->count())
                     @foreach ($hotel->metros as $metro)

@@ -5114,6 +5114,20 @@ button.modal-close:focus {
   .error-info-title {
     font-size: 28px;
   }
+  .block-desktop.metro-rwd {
+    display: block;
+    margin-top: 22px;
+  }
+
+  .block-desktop.metro-rwd .room-metro .metro {
+    display: none;
+  }
+  .block-desktop.metro-rwd .room-metro .metro:nth-child(1) {
+    display: block;
+  }
+  .block-desktop.metro-rwd .room-metro .metro:nth-child(2) {
+    display: block;
+  }
     .room-metro {
         display: flex;
         flex-wrap: wrap;

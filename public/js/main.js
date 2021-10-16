@@ -447,6 +447,7 @@ $(document).ready(function () {
         $(hotelName).show();
         $(hotelAddress).show();
         $(hotelMetro).addClass('open');
+        $(".block-desktop.metro-rwd").hide();
     });
     //datalist
     $('.flexdatalist').flexdatalist({
