@@ -14,9 +14,20 @@ class HotelController extends Controller
   public function index(Request $request): View
   {
     $Breadcrumbs_din = $this->get_bread();
+    
+    $sortByRequested = [
+      'cost' => false,
+    ];
 
-    $hotels = Hotel::paginate(18);
-    return view('hotel.index', compact('hotels', 'request', 'Breadcrumbs_din'));
+    if($request->has('cost')) {
+      $sortByRequested['cost'] = $orderCost = $request->input('cost');
+
+      $hotels = Hotel::orderByCost($orderCost)->paginate(18);
+    } else {
+      $hotels = Hotel::paginate(18);
+    }
+
+    return view('hotel.index', compact('hotels', 'request', 'Breadcrumbs_din', 'sortByRequested'));
   }
 
   public function show(Hotel $hotel, Request $request): View

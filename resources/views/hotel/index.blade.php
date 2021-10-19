@@ -27,8 +27,8 @@
 
                     <form id="search-filter" class="search-filter" method="get">
                         <div class="search-filter-item search-filter-sort">
-                            <button class="search-filter-price-btn" name="cost" value="desc"></button>
-                            <button class="search-filter-price-btn" name="cost" value="asc"></button>
+                            <button class="search-filter-price-btn {{ $sortByRequested['cost'] == 'desc' ? 'active' : '' }}" name="cost" value="desc"></button>
+                            <button class="search-filter-price-btn {{ $sortByRequested['cost'] == 'asc' ? 'active' : '' }}" name="cost" value="asc"></button>
                             <label class="search-filter-label">Сортировать по цене</label>
                         </div>
                         <div class="search-filter-item">

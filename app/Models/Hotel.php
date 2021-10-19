@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\Hotel
@@ -228,6 +229,11 @@ class Hotel extends Model
     });
   }
   ### END SCOPES
+
+  public static function orderByCost(string $orderBy): Builder
+  {
+    return Hotel::leftJoin('min_hotels_costs', (new self())->getTable() . '.id', '=', 'min_hotels_costs.hotel_id')->orderBy('min_hotels_costs.min_cost', $orderBy);
+  }
 
   ### RELATIONS
 
