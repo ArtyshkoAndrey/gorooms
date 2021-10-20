@@ -123,6 +123,11 @@ class Room extends Model
     });
   }
 
+  public static function orderByCost(string $orderBy): Builder
+  {
+    return Room::leftJoin('min_rooms_costs', (new self())->getTable() . '.id', '=', 'min_rooms_costs.room_id')->orderBy('min_rooms_costs.min_cost', $orderBy);
+  }
+
   public function category(): BelongsTo
   {
     return $this->belongsTo(Category::class);
