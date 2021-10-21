@@ -2,6 +2,11 @@
 
 @section('content')
     <div class="container">
+        @if(session()->has('message'))
+    <div class="alert alert-success">
+        {{ session()->get('message') }}
+    </div>
+@endif
         <div class="card">
             <div class="card-header">
                 <div class="d-flex w-100 justify-content-between align-items-center">
@@ -34,7 +39,11 @@
                                 <td>
                                     <div class="btn-group btn-group-sm">
                                         <a href="{{ route('admin.hotels.edit', $hotel) }}" class="btn btn-success">Изменить</a>
-                                        <a href="{{ route('admin.rooms.create', $hotel) }}" class="btn btn-primary">Создать номер</a>
+                                        @if($hotel->show)
+                                            <a href="{{ route('admin.hotels.block', $hotel) }}" class="btn btn-primary">Заблокировать отель</a>
+                                        @else
+                                            <a href="{{ route('admin.hotels.unblock', $hotel) }}" class="btn btn-primary">Разблокировать отель</a>
+                                        @endif
                                         <button type="button" data-action="{{ route('admin.hotels.destroy', $hotel) }}" class="btn btn-danger js-delete">Удалить</button>
                                     </div>
                                 </td>
@@ -43,6 +52,7 @@
                         </tbody>
                     </table>
                 </div>
+                {{ $hotels->render() }}
             </div>
         </div>
     </div>

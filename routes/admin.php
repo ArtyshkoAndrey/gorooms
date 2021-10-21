@@ -13,7 +13,10 @@ Route::resource('hotels', 'HotelController');
 Route::resource('rooms', 'RoomController', [
     'except' => ['create']
 ]);
+
 Route::get('/rooms/create/{hotel}', 'RoomController@create')->name('rooms.create');
+Route::get('/rooms/block/{hotel}', 'HotelController@block')->name('hotels.block');
+Route::get('/rooms/unblock/{hotel}', 'HotelController@unblock')->name('hotels.unblock');
 
 Route::get('/attributes/{category}', 'AttributeController@index')
     ->name('attributes.index')

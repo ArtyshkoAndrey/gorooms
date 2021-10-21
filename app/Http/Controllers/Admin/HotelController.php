@@ -28,7 +28,7 @@ class HotelController extends Controller
      */
     public function index(): View
     {
-        $hotels = Hotel::all();
+        $hotels = Hotel::paginate(20);
         return view('admin.hotel.index', compact('hotels'));
     }
 
@@ -43,6 +43,20 @@ class HotelController extends Controller
         $costTypes = CostType::orderBy('sort')->get();
         $hotelTypes = HotelType::orderBy('sort')->get();
         return view('admin.hotel.create', compact('attributes', 'costTypes', 'hotelTypes'));
+    }
+
+    public function block(Hotel $hotel)
+    {
+        $hotel->block();
+
+        return redirect()->back()->with('message', __('messages.hotel_blocked', ['name' => $hotel->name]));
+    }
+
+    public function unblock(Hotel $hotel)
+    {
+        $hotel->unblock();
+
+        return redirect()->back()->with('message', __('messages.hotel_unblocked', ['name' => $hotel->name]));
     }
 
     private function save(Hotel &$hotel, HotelRequest $request)

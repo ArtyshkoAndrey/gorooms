@@ -536,4 +536,16 @@ class Hotel extends Model
     return 'disabled';
   }
 
+  public function block() 
+  {
+    $this->show = false;
+    $this->save();
+  }
+
+  public function unblock()
+  {
+    $this->show = true;
+    $this->save();
+  }
+
 }

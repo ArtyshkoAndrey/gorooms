@@ -7,4 +7,6 @@
 
 return [
   "Regards" => "С уважением",
+  "hotel_blocked" => "Отель :name заблокирован",
+  "hotel_unblocked" => "Отель :name разблокирован",
 ];
