@@ -20,6 +20,7 @@ class SearchController extends Controller
   {
     $query = $request->get('query', '');
     $attributes = $request->get('attributes', ['hotel' => [], 'room' => []]);
+
     $city = '';
     if (!$request->is('api/*'))
       $city = $request->session()->get('city', Settings::option('city_default', false));
@@ -183,8 +184,6 @@ class SearchController extends Controller
       $per_page = Hotel::PER_PAGE;
       $hotels = $hotels->forPage($page, $per_page);
       return view('render.hotel.index', compact('hotels'));
-
-
     }
 
     $count = $is_room ? $rooms->count() : $hotels->count();

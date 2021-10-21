@@ -1,4 +1,11 @@
 <form action="{{ $search_link ?? route('search') }}" id="js-advanced-search" class="advanced-search" method="GET">
+    @php($hotels_attributes = \Illuminate\Support\Facades\Cache::remember('hotels_attributes', 60*60*24*12, function() {
+        return \App\Models\Attribute::forHotels()->filtered()->get();
+    }))
+    @php($rooms_attributes = \Illuminate\Support\Facades\Cache::remember('rooms_attributes', 60*60*24*12, function () {
+        return \App\Models\Attribute::forRooms()->filtered()->get();
+    }))
+
     @if(@isset($address))
         <script>
             var SearchData = {
@@ -18,7 +25,18 @@
                        value="{{ old('query') ?? @$query ?? ''}}">
                 <button class="btn btn-orange search-btn">Найти</button>
             </div>
-            <div class="search-tags"></div>
+            <div class="search-tags">
+                @foreach ($hotels_attributes as $attribute)
+                        @if(in_array($attribute->id, (isset($attributes['hotel']) ? $attributes['hotel'] : [])))
+                            <div class="search-tag"><span>{{ $attribute->name }}</span><button data-for="advanced-search-hotel-{{ $attribute->id }}"></button></div>
+                        @endif
+                    @endforeach
+                    @foreach ($rooms_attributes as $attribute)
+                        @if(in_array($attribute->id, (isset($attributes['room']) ? $attributes['room'] : [])))
+                            <div class="search-tag"><span>{{ $attribute->name }}</span><button data-for="advanced-search-rooms-{{ $attribute->id }}"></button></div>
+                        @endif
+                    @endforeach
+            </div>
             <div class="search-dates">
              <!--   <div class="form-group-date">
                     <p class="form-group-date-label">Заезд:</p>
@@ -194,17 +212,15 @@
                     <p class="advanced-search-title">Детально об отлеле <button class="js-search-btn-collapse search-btn-collapse" type="button"></button></p>
                     <div class="filter-collapse js-search-collapse">
                         <ul class="advanced-search-details-list">
-    @php($hotels_attributes = \Illuminate\Support\Facades\Cache::remember('hotels_attributes', 60*60*24*12, function() {
-        return \App\Models\Attribute::forHotels()->filtered()->get();
-    }))
+    
                             @foreach ($hotels_attributes as $attribute)
                                 <li class="advanced-search-details-item">
-                                    <input id="advanced-search-hotel-{{ $loop->index }}" type="checkbox"
+                                    <input id="advanced-search-hotel-{{ $attribute->id }}" type="checkbox"
                                            @if(in_array($attribute->id, (isset($attributes['hotel']) ? $attributes['hotel'] : [])))
                                            checked
                                            @endif
                                            name="attributes[hotel][]" value="{{ $attribute->id }}" class="checkbox">
-                                    <label for="advanced-search-hotel-{{ $loop->index }}"
+                                    <label for="advanced-search-hotel-{{ $attribute->id }}"
                                            class="checkbox-label checkbox-label-light">{{ $attribute->name }}</label>
                                 </li>
                             @endforeach
@@ -225,17 +241,15 @@
                     <p class="advanced-search-title">Детально о номерах <button class="js-search-btn-collapse search-btn-collapse" type="button"></button></p>
                     <div class="filter-collapse js-search-collapse">
                         <ul class="advanced-search-details-list">
-    @php($rooms_attributes = \Illuminate\Support\Facades\Cache::remember('rooms_attributes', 60*60*24*12, function () {
-        return \App\Models\Attribute::forRooms()->filtered()->get();
-    }))
+    
                             @foreach ($rooms_attributes as $attribute)
                                 <li class="advanced-search-details-item">
-                                    <input id="advanced-search-rooms-{{ $loop->index }}" type="checkbox"
+                                    <input id="advanced-search-rooms-{{ $attribute->id }}" type="checkbox"
                                            @if(in_array($attribute->id, (isset($attributes['room']) ? $attributes['room'] : [])))
                                            checked
                                            @endif
                                            name="attributes[room][]" value="{{ $attribute->id }}" class="checkbox">
-                                    <label for="advanced-search-rooms-{{ $loop->index }}"
+                                    <label for="advanced-search-rooms-{{ $attribute->id }}"
                                            class="checkbox-label checkbox-label-light">{{ $attribute->name }}</label>
                                 </li>
                             @endforeach
@@ -281,7 +295,18 @@
                            placeholder="Название отеля, округ, район город, метро">
                     <button class="btn btn-orange search-btn">Найти</button>
                 </div>
-                <div class="search-tags"></div>
+                <div class="search-tags">
+                    @foreach ($hotels_attributes as $attribute)
+                        @if(in_array($attribute->id, (isset($attributes['hotel']) ? $attributes['hotel'] : [])))
+                            <div class="search-tag"><span>{{ $attribute->name }}</span><button data-for="advanced-search-hotel-{{ $attribute->id }}"></button></div>
+                        @endif
+                    @endforeach
+                    @foreach ($rooms_attributes as $attribute)
+                        @if(in_array($attribute->id, (isset($attributes['room']) ? $attributes['room'] : [])))
+                            <div class="search-tag"><span>{{ $attribute->name }}</span><button data-for="advanced-search-rooms-{{ $attribute->id }}"></button></div>
+                        @endif
+                    @endforeach
+                </div>
                 <div class="search-bottom">
                    <!-- <div class="search-dates">
                         <div class="form-group-date">

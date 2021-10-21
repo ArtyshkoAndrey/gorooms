@@ -109,6 +109,16 @@ $(document).ready(function () {
     }
 
     //advanced-search
+    $(".search-tags button").on("click", function (e) {
+        e.preventDefault();
+
+        dataFor = $(this).data("for");
+
+        $("#" + dataFor).prop("checked", !$("#" + dataFor).prop("checked"));
+        
+        $(".search-bottom-in .btn.btn-blue").trigger("click");
+    });
+
     $('#js-advanced-search-open-btn').on('click', function (e) {
         e.stopPropagation();
         e.preventDefault();
