@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('content')
-    <div class="container">
-        @if(session()->has('message'))
-    <div class="alert alert-success">
-        {{ session()->get('message') }}
-    </div>
-@endif
+        @section('content')
+            <div class="container">
+                @if(session()->has('message'))
+            <div class="alert alert-success">
+                {{ session()->get('message') }}
+            </div>
+        @endif
         <div class="card">
             <div class="card-header">
                 <div class="d-flex w-100 justify-content-between align-items-center">
@@ -15,6 +15,12 @@
                 </div>
             </div>
             <div class="card-body">
+                <form class="form-inline float-right" method="get">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <input class="form-control" name="search" placeholder="Поиск" value="{{ $search }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Поиск</button>
+                </form>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>

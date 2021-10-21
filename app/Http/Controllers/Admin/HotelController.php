@@ -26,10 +26,19 @@ class HotelController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $hotels = Hotel::paginate(20);
-        return view('admin.hotel.index', compact('hotels'));
+        $search = '';
+
+        if($request->has('search')) {
+            $search = $request->input('search');
+
+            $hotels = Hotel::query()->where('name', 'LIKE', "%{$search}%")->paginate(20);
+        } else {
+            $hotels = Hotel::paginate(20);
+        }
+        
+        return view('admin.hotel.index', compact('hotels', 'search'));
     }
 
     /**
