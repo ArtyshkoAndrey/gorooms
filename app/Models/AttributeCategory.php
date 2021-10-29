@@ -34,11 +34,17 @@ use Illuminate\Support\Carbon;
  */
 class AttributeCategory extends Model
 {
+  public const TYPES = [
+    Hotel::class => 'Отели',
+    Room::class => 'Номера',
+  ];
+
   /**
    * @var string[]
    */
   protected $fillable = [
-    'name'
+    'name',
+    'model_type',
   ];
 
   /**

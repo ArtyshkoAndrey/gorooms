@@ -41,47 +41,29 @@ class Attribute extends Model
 {
   use CreatedAtOrdered;
 
-  public const MODELS = [
-    Hotel::class => 'Отели',
-    Room::class => 'Номера',
-  ];
   protected $fillable = [
     'name',
     'description',
-    'model',
+    'attribute_category_id',
     'in_filter'
   ];
 
   public function scopeForHotels(Builder $builder)
   {
-    return $builder->where('model', '=', Hotel::class);
+    return $builder->whereIn('attribute_category_id', function($query) {
+      $query->select('id')->from(with(new AttributeCategory())->getTable())->where("model_type", Hotel::class) ;
+    });
   }
 
   public function scopeForRooms(Builder $builder)
   {
-    return $builder->where('model', '=', Room::class);
+    return $builder->whereIn('attribute_category_id', function ($query) {
+      $query->select('id')->from(with(new AttributeCategory())->getTable())->where("model_type", Room::class);
+    });
   }
 
   public function scopeFiltered(Builder $builder)
   {
     return $builder->where('in_filter', '=', true);
-  }
-
-  public function getModelAttribute($value)
-  {
-    return self::MODELS[$value];
-  }
-
-  public function getCategoryAttribute()
-  {
-    $model = explode('\\', $this->getModelNameAttribute());
-    $model = end($model);
-    $model = mb_strtolower($model);
-    return $model;
-  }
-
-  public function getModelNameAttribute()
-  {
-    return $this->getAttributes()['model'];
   }
 }

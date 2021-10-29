@@ -21,9 +21,14 @@ Route::get('/rooms/unblock/{hotel}', 'HotelController@unblock')->name('hotels.un
 Route::get('/attributes/{category}', 'AttributeController@index')
     ->name('attributes.index')
     ->where('category', '(room|hotel)');
-Route::resource('attributes', 'AttributeController', [
-    'except' => ['index'],
-]);
+
+
+// Route::resource('attributes', 'AttributeController', [
+//     'except' => ['index'],
+// ]);
+Route::resource('attributes', 'AttributeController');
+Route::resource('attributes_categories', 'AttributeCategoryController');
+
 Route::resource('hotels/{hotel?}/categories', 'CategoryController', [
     'except' => ['index']
 ]);

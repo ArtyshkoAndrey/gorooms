@@ -29,7 +29,7 @@ class AttributeRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'in_filter' => ['required', 'boolean'],
-            'model' => ['required', 'in:'.implode(',', array_keys(Attribute::MODELS))],
+            'attribute_category_id' => ['required'],
         ];
     }
 }

@@ -1,6 +1,6 @@
 <div class="form-group">
     <label for="name">Наименование</label>
-    <input type="text" name="name" id="name" value="{{ old('name') ?? @$hotel->name ?? '' }}"
+    <input type="text" name="name" id="name" value="{{ old('name') ?? @$attribute->name ?? '' }}"
            class="form-control @error('name') is-invalid @enderror" required/>
     @error('name')
     <div class="invalid-feedback">{{ $message }}</div>
@@ -11,11 +11,18 @@
 @endif
 <div class="form-group">
     <label for="model">Категория</label>
-    <select name="model" id="model" class="form-control">
+    <select name="attribute_category_id" class="form-control">
         <option value="">Выберите категорию</option>
-        @foreach(\App\Models\Attribute::MODELS AS $model => $title)
-            <option value="{{ $model }}" @if(isset($attribute) && $attribute->model_name === $model) selected @endif>{{ $title }}</option>
-        @endforeach
+        <optgroup label="Отели">
+            @foreach($hotel_categories AS $model)
+                <option value="{{ $model->id }}" @if(isset($attribute) && $attribute->attribute_category_id === $model->id) selected @endif>{{ $model->name }}</option>
+            @endforeach
+        </optgroup>
+        <optgroup label="Комнаты">
+            @foreach($room_categories AS $model)
+                <option value="{{ $model->id }}" @if(isset($attribute) && $attribute->attribute_category_id === $model->id) selected @endif>{{ $model->name }}</option>
+            @endforeach
+        </optgroup>
     </select>
 </div>
 <div class="form-group">
