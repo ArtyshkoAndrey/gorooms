@@ -43,9 +43,10 @@ class AttributeCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'model_type' => 'required',
         ]);
 
-        AttributeCategory::create($validated);
+        $attributeCategory = AttributeCategory::create($validated);
 
         return redirect()->route('admin.attributes_categories.index')->with('success');
     }
@@ -73,6 +74,7 @@ class AttributeCategoryController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'model_type' => 'required',
         ]);
 
         $attributesCategory->update($validated);

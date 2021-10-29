@@ -14,4 +14,8 @@
             </div>
         </form>
     </div>
+<<<<<<< HEAD
 @stop
+=======
+@stop
+>>>>>>> c2cae19... Attributes categories

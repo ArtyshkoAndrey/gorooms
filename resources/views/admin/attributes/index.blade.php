@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header">
                 <div class="d-flex w-100 justify-content-between align-items-center">
-                    <div class="h4 p-0 m-0">Список атрибутов для {{ $category === 'room' ? 'номеров' : 'отелей' }}</div>
+                    <div class="h4 p-0 m-0">Список атрибутов</div>
                     <a href="{{ route('admin.attributes.create') }}" class="btn btn-primary btn-sm">Новый атрибут</a>
                 </div>
             </div>
@@ -37,6 +37,7 @@
                         </tbody>
                     </table>
                 </div>
+                {{ $attributes->render() }}
             </div>
         </div>
     </div>

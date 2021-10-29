@@ -21,11 +21,14 @@ Route::get('/rooms/block/{hotel}', 'HotelController@block')->name('hotels.block'
 Route::get('/rooms/unblock/{hotel}', 'HotelController@unblock')->name('hotels.unblock');
 
 Route::get('/attributes/{category}', 'AttributeController@index')
-  ->name('attributes.index')
-  ->where('category', '(room|hotel)');
-Route::resource('attributes', 'AttributeController', [
-  'except' => ['index'],
-]);
+    ->name('attributes.index')
+    ->where('category', '(room|hotel)');
+
+
+// Route::resource('attributes', 'AttributeController', [
+//     'except' => ['index'],
+// ]);
+Route::resource('attributes', 'AttributeController');
 Route::resource('attributes_categories', 'AttributeCategoryController');
 
 Route::resource('hotels/{hotel?}/categories', 'CategoryController', [
