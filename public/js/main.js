@@ -624,47 +624,47 @@ function SearchFilters() {
                 await districtInit();
                 await changeForm();
                 await fn();
-            } else if (typeof SearchData != 'undefinded') {
-                if (SearchData["city"] != '') {
-                    city = SearchData["city"];
+            } else if (typeof SearchData != "undefined") {
+              if (SearchData["city"] != "") {
+                city = SearchData["city"];
+              }
+              if (SearchData["district"] != "") {
+                district = SearchData["district"];
+              }
+              if (SearchData["metro"] != "") {
+                metro = SearchData["metro"];
+              }
+              if (SearchData["area"] != "") {
+                area = SearchData["area"];
+              }
+
+              await selectMetro
+                .find(`option[value="${metro}"]`)
+                .prop("selected", true)
+                .trigger("change")
+                .trigger("refresh");
+              await selectType
+                .find(`option[value="${type}"]`)
+                .prop("selected", true)
+                .trigger("change")
+                .trigger("refresh");
+              await selectArea
+                .find(`option[value="${area}"]`)
+                .prop("selected", true)
+                .trigger("change")
+                .trigger("refresh");
+              const districtInit = () => {
+                if (selectDistrict.find(`option[value="${district}"]`)) {
+                  selectDistrict
+                    .find(`option[value="${district}"]`)
+                    .prop("selected", true)
+                    .trigger("change")
+                    .trigger("refresh");
                 }
-                if (SearchData["district"] != "") {
-                  district = SearchData["district"];
-                }
-                if (SearchData["metro"] != "") {
-                  metro = SearchData["metro"];
-                }
-                if (SearchData["area"] != "") {
-                  area = SearchData["area"];
-                }
-                
-                await selectMetro
-                  .find(`option[value="${metro}"]`)
-                  .prop("selected", true)
-                  .trigger("change")
-                  .trigger("refresh");
-                await selectType
-                  .find(`option[value="${type}"]`)
-                  .prop("selected", true)
-                  .trigger("change")
-                  .trigger("refresh");
-                await selectArea
-                  .find(`option[value="${area}"]`)
-                  .prop("selected", true)
-                  .trigger("change")
-                  .trigger("refresh");
-                const districtInit = () => {
-                  if (selectDistrict.find(`option[value="${district}"]`)) {
-                    selectDistrict
-                      .find(`option[value="${district}"]`)
-                      .prop("selected", true)
-                      .trigger("change")
-                      .trigger("refresh");
-                  }
-                };
-                await districtInit();
-                await changeForm();
-                await fn();
+              };
+              await districtInit();
+              await changeForm();
+              await fn();
             } else {
               fn();
             }

@@ -523,6 +523,7 @@ class SearchController extends Controller
     $query = '';
 
     $rooms = Room::whereIn('hotel_id', $hotels->pluck('id')->toArray())->paginate(20);
+    
     $with_map = false;
     $title = 'Отели города ';
     if (isset($slugs['city'])) {

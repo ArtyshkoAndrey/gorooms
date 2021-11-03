@@ -82,7 +82,7 @@
                     @endforeach
 
                 </div>
-
+                {{-- Показать еще --}}
             </div>
         @else
             <div class="container">
@@ -100,8 +100,9 @@
 
         @if(!is_null(@$pageDescription))
             <div class="container" style="margin-top: 20px;">
-                {!! html_entity_decode(@$pageDescription->description) !!}
-
+                <div class="page-description">
+                    {!! html_entity_decode(@$pageDescription->description) !!}
+                </div>
             </div>
 
         @endif
