@@ -79,7 +79,7 @@
                                         data-placeholder="Округ">
                                 </select>
                             </div>
-                            <div class="form-group" style="display: none;">
+                            <div class="form-group">
                                 <select id="advanced-search-location-region"
                                         name="address[city_district]"
                                         class="form-control"
