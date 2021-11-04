@@ -469,7 +469,7 @@ $(document).ready(function () {
 
 function js_hotel_card_slider_init(){
     $('.js-hotel-card-slider').each(function () {
-        var hotelCardSwiper = new Swiper(this, {
+        window.hotelCardSwiper = new Swiper(this, {
             navigation: {
                 nextEl: this.querySelector('.swiper-button.swiper-button-next'),
                 prevEl: this.querySelector('.swiper-button.swiper-button-prev')
@@ -500,6 +500,8 @@ async function loadMore(e, url) {
         $('.items-container').append(html);
         updateCounter(html);
     }
+    window.hotelCardSwiper.destroy();
+    js_hotel_card_slider_init();
     loading = false;
 }
 

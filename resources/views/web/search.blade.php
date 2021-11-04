@@ -80,9 +80,13 @@
                     @foreach ($rooms as $room)
                         @include('room._hot')
                     @endforeach
-
                 </div>
-                {{-- Показать еще --}}
+                <div class="show-more">
+                    <p class="show-more-counter">Загружено: {{ $rooms->count() }} ({{ $rooms->total()}})</p>
+                    @if($rooms->total() > $rooms->count())
+                        <button id="rooms-load-more" class="show-more-btn" type="button">Загрузить еще</button>
+                    @endif
+                </div>
             </div>
         @else
             <div class="container">
