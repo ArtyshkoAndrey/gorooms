@@ -37,7 +37,8 @@ class HotelController extends Controller
     $pageAbout = $hotel->meta ?? new class {
         public $title = null;
         public $meta_description = null;
-      };
+    };
+
 
     $pageAbout->title ??= sprintf('Отель "%s" - бронь номера на час ▶Gorooms', $hotel->name);
 

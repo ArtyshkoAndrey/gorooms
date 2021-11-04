@@ -145,7 +145,9 @@ class HotelController extends Controller
      */
     public function edit(Hotel $hotel): View
     {
-        $attributes = Attribute::where('model', Hotel::class)->orWhereNull('model')->get();
+        // $attributes = Attribute::where('model', Hotel::class)->orWhereNull('model')->get();
+        $attributes = Attribute::forHotels()->get();
+    
         $costTypes = CostType::orderBy('sort')->get();
         $hotelTypes = HotelType::orderBy('sort')->get();
         return view('admin.hotel.edit', compact('hotel', 'attributes', 'costTypes', 'hotelTypes'));
