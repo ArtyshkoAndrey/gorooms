@@ -51,7 +51,7 @@ class Attribute extends Model
   public function scopeForHotels(Builder $builder)
   {
     return $builder->whereIn('attribute_category_id', function($query) {
-      $query->select('id')->from(with(new AttributeCategory())->getTable())->where("model_type", Hotel::class) ;
+      $query->select('id')->from(with(new AttributeCategory())->getTable())->where("model_type", Hotel::class);
     });
   }
 
