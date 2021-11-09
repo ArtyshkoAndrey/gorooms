@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Settings;
-use App\Models\Room;
 use App\Helpers\{Json, Area};
-use App\Models\Hotel;
+use App\Models\{Hotel, Room, Metro, Address};
 use App\Models\Search;
 use App\Models\Attribute;
 use Illuminate\Http\Request;
@@ -454,6 +453,71 @@ class SearchController extends Controller
     // return dd('end');
 
     return view('web.search', compact('hotels', 'query', 'rooms', 'with_map', 'title', 'attributes', 'address', 'request', 'pageDescription'));
+  }
+
+  public function hint(Request $request)
+  {
+    $query = $request->get('query', '');
+
+    if(!$query) {
+      return response()->json([], 200);
+    }
+
+    $query .= "%";
+
+    $items = [];
+
+    $hotels = Hotel::where('name', 'LIKE', $query)->get();
+
+    foreach($hotels as $hotel) {
+      $items[] = $hotel->name;
+    }
+
+    $rooms = Room::where('name', 'LIKE', $query)->get();
+
+    foreach ($rooms as $room) {
+      $items[] = $room->name;
+    }
+
+    $metros = Metro::where('name', 'LIKE', $query)->get();
+
+    foreach ($metros as $metro) {
+      $items[] = $metro->name;
+    }
+
+    $addresses_regions = Address::where('region', 'LIKE', $query)->get();
+    
+    foreach ($addresses_regions as $address) {
+      $items[] = $address->region;
+    }
+
+    $addresses_cities = Address::where('city', 'LIKE', $query)->get();
+
+    foreach ($addresses_cities as $address) {
+      $items[] = $address->city;
+    }
+
+    $addresses_streets = Address::where('street_with_type', 'LIKE', $query)->get();
+
+    foreach ($addresses_streets as $address) {
+      $items[] = $address->street_with_type;
+    }
+
+    $addresses_districts = Address::where('city_district', 'LIKE', $query)->get();
+
+    foreach ($addresses_districts as $address) {
+      $items[] = $address->city_district;
+    }
+
+    $addresses_areas = Address::where('city_area', 'LIKE', $query)->get();
+
+    foreach ($addresses_areas as $address) {
+      $items[] = $address->city_area;
+    }
+
+    $items = array_unique($items);
+
+    return response()->json(compact('items'), 200);
   }
 
   private function getCost(Request $request)

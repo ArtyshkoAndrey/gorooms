@@ -465,6 +465,35 @@ $(document).ready(function () {
         minLength: 0
     })
 
+    $("#autocomplete").on("click", ".item", function () {
+        let hint = $(this).text();
+
+        $("#search").val(hint);
+        $("#autocomplete").empty();
+    });
+
+    $("#search").on("input", function () {
+        let query = $(this).val();
+
+        $.ajax({
+          url: "api/hint",
+          data: { query: query },
+          dataType: "JSON",
+            success: function (data) {
+                let items = ""
+
+                for (let i = 0; i < data.items.length; i++) {
+                    const element = data.items[i];
+
+                    items += "<div class='item'>" + element + "</div>";
+                }
+
+                $("#autocomplete").empty();
+                $("#autocomplete").append(items);
+          },
+        });
+    } );
+
 });
 
 function js_hotel_card_slider_init(){

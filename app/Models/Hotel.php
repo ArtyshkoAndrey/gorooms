@@ -547,5 +547,4 @@ class Hotel extends Model
     $this->show = true;
     $this->save();
   }
-
 }

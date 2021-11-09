@@ -290,6 +290,8 @@
                            placeholder="Название отеля, округ, район город, метро">
                     <button class="btn btn-orange search-btn">Найти</button>
                 </div>
+                <div id="autocomplete">
+                </div>
                 <div class="search-tags">
                     @foreach ($hotels_attributes as $attribute)
                         @if(in_array($attribute->id, (isset($attributes['hotel']) ? $attributes['hotel'] : [])))
