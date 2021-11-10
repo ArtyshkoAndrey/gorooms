@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AttributeRequest;
-use App\Models\{AttributeCategory, Attribute, Hotel, Room};
+use App\Models\Attribute;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -16,11 +16,15 @@ class AttributeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): View
+    public function index(string $category = null): View
     {
-        $attributes = Attribute::paginate(20);
-
-        return view('admin.attributes.index', compact('attributes'));
+        if ($category === 'room')
+            $attributes = Attribute::forRooms()->get();
+        elseif ($category === 'hotel')
+            $attributes = Attribute::forHotels()->get();
+        else
+            abort(404);
+        return view('admin.attributes.index', compact('attributes', 'category'));
     }
 
     /**
@@ -30,10 +34,7 @@ class AttributeController extends Controller
      */
     public function create(): View
     {
-        $hotel_categories = AttributeCategory::where("model_type", Hotel::class)->get();
-        $room_categories = AttributeCategory::where("model_type", Room::class)->get();
-
-        return view('admin.attributes.create', compact('hotel_categories', 'room_categories'));
+        return view('admin.attributes.create');
     }
 
     /**
@@ -68,10 +69,7 @@ class AttributeController extends Controller
      */
     public function edit(Attribute $attribute): View
     {
-        $hotel_categories = AttributeCategory::where("model_type", Hotel::class)->get();
-        $room_categories = AttributeCategory::where("model_type", Room::class)->get();
-
-        return view('admin.attributes.edit', compact('attribute', 'hotel_categories', 'room_categories'));
+        return view('admin.attributes.edit', compact('attribute'));
     }
 
     /**
