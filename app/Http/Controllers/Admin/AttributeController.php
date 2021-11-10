@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AttributeRequest;
 use App\Models\Attribute;
+use App\Models\AttributeCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -69,7 +70,9 @@ class AttributeController extends Controller
      */
     public function edit(Attribute $attribute): View
     {
-        return view('admin.attributes.edit', compact('attribute'));
+        $attributeCategories = AttributeCategory::all();
+        
+        return view('admin.attributes.edit', compact('attribute', 'attributeCategories'));
     }
 
     /**

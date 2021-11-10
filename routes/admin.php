@@ -24,6 +24,8 @@ Route::get('/attributes/{category}', 'AttributeController@index')
 Route::resource('attributes', 'AttributeController', [
     'except' => ['index'],
 ]);
+Route::resource('attributes_categories', 'AttributeCategoryController');
+
 Route::resource('hotels/{hotel?}/categories', 'CategoryController', [
     'except' => ['index']
 ]);
