@@ -22,7 +22,7 @@
   <section class="section">
     <div class="container">
       @if ($with_map)
-        <h1 class="section-title">{{ @$pageDescription->title ?? $title }}</h1>
+        <h1 class="section-title">{!! @$pageDescription->title ?? $title !!}</h1>
         <div class="map-search-wrapper">
           <div id="map" style="width: 100%; height: 600px;"></div>
         </div>
