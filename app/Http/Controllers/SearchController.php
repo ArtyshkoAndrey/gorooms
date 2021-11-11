@@ -35,140 +35,156 @@ class SearchController extends Controller
 
     $rooms = false;
     $query_args = $search->createQueryArray($query);
-
-    if (!$is_room) {
-      $hotels = Hotel::with(['rooms', 'address', 'attrs']);
-      if ($request->has('hotel_moderate')) {
-        $hotels->where('moderate', 1)->orWhere('show', 0);
-      }
-      foreach ($query_args as $arg) {
-        $hotels->where('name', 'LIKE', $arg)->orWhereHas('address', function (Builder $builder) use ($arg) {
-          $builder->where('value', 'LIKE', $arg);
-        });
-      }
-
-      foreach ($address as $key => $value) {
-        if (empty($value))
-          continue;
-        $hotels->whereHas('address', function (Builder $builder) use ($key, $value) {
-          $builder->where($key, $value);
-        });
-      }
-      if ($hotel_type)
-        $hotels->where('type_id', $hotel_type);
-      if ($metro)
-        $hotels->whereHas('metros', function (Builder $builder) use ($metro) {
-          $builder->whereRaw('LOWER(name) = LOWER(?)', [$metro]);
-        });
-      $hotels = $hotels->get();
-      if (count($attributes['hotel'])) {
-        $hotels = $hotels->map(function ($hotel) use ($attributes) {
-          $diffs = array_intersect($hotel->attrs()->pluck('id')->toArray(), $attributes['hotel']);
-          if (count($diffs) === count($attributes['hotel']))
-            return $hotel;
-          return null;
-        })->whereNotNull();
-      }
-      if ($cost = $this->getCost($request)) {
-        $before = $hotels->count();
-        $costs = [];
-        $hotels = $hotels->filter(function (Hotel $hotel, int $index) use ($cost, &$costs) {
-          $costs = $hotel->getMinCosts();
-          foreach ($costs as $item) {
-
-            if (isset($item->id)) {
-              if ($item->id !== $cost['type']) {
-                continue;
-              }
-              if ($cost['condition'] === 'BETWEEN') {
-                return $item->value >= $cost['value'][0] && $item->value <= $cost['value'][1];
-              }
-
-              if ($cost['condition'] === '>') {
-                return $item->value > $cost['value'][0];
-              }
-
-              if ($cost['condition'] === '>=') {
-                return $item->value >= $cost['value'][0];
-              }
-
-              if ($cost['condition'] === '<') {
-                return $item->value < $cost['value'][0];
-              }
-
-              if ($cost['condition'] === '<=') {
-                return $item->value <= $cost['value'][0];
-              }
-            }
-
-            return false;
-          }
-        })->all();
-        $hotels = collect($hotels);
-      }
+    $moderate = $request->has('moderate');
+    if ($moderate) {
+      $hotels = Hotel::withoutGlobalScope('moderation')
+        ->where('moderate', true)
+        ->where('old_moderate', true)
+        ->orWhereHas('rooms', function ($q) {
+          $q->where('moderate', true);
+        })
+        ->orderBy('id')
+        ->paginate(5);
+      $hotels->appends(['moderate' => true]);
+      $is_room = false;
+//      $hotels = $hotels->get();
     } else {
-      $rooms = Room::with(['hotel', 'hotel.address']);
-      if ($request->has('room_moderate')) {
-        $rooms->where('moderate', 1);
+
+      if (!$is_room) {
+        $hotels = Hotel::with(['rooms', 'address', 'attrs']);
+        if ($request->has('hotel_moderate')) {
+          $hotels->where('moderate', 1)->orWhere('show', 0);
+        }
+        foreach ($query_args as $arg) {
+          $hotels->where('name', 'LIKE', $arg)->orWhereHas('address', function (Builder $builder) use ($arg) {
+            $builder->where('value', 'LIKE', $arg);
+          });
+        }
+
+        foreach ($address as $key => $value) {
+          if (empty($value))
+            continue;
+          $hotels->whereHas('address', function (Builder $builder) use ($key, $value) {
+            $builder->where($key, $value);
+          });
+        }
+        if ($hotel_type)
+          $hotels->where('type_id', $hotel_type);
+        if ($metro)
+          $hotels->whereHas('metros', function (Builder $builder) use ($metro) {
+            $builder->whereRaw('LOWER(name) = LOWER(?)', [$metro]);
+          });
+        $hotels = $hotels->get();
+        if (count($attributes['hotel'])) {
+          $hotels = $hotels->map(function ($hotel) use ($attributes) {
+            $diffs = array_intersect($hotel->attrs()->pluck('id')->toArray(), $attributes['hotel']);
+            if (count($diffs) === count($attributes['hotel']))
+              return $hotel;
+            return null;
+          })->whereNotNull();
+        }
+        if ($cost = $this->getCost($request)) {
+          $before = $hotels->count();
+          $costs = [];
+          $hotels = $hotels->filter(function (Hotel $hotel, int $index) use ($cost, &$costs) {
+            $costs = $hotel->getMinCosts();
+            foreach ($costs as $item) {
+
+              if (isset($item->id)) {
+                if ($item->id !== $cost['type']) {
+                  continue;
+                }
+                if ($cost['condition'] === 'BETWEEN') {
+                  return $item->value >= $cost['value'][0] && $item->value <= $cost['value'][1];
+                }
+
+                if ($cost['condition'] === '>') {
+                  return $item->value > $cost['value'][0];
+                }
+
+                if ($cost['condition'] === '>=') {
+                  return $item->value >= $cost['value'][0];
+                }
+
+                if ($cost['condition'] === '<') {
+                  return $item->value < $cost['value'][0];
+                }
+
+                if ($cost['condition'] === '<=') {
+                  return $item->value <= $cost['value'][0];
+                }
+              }
+
+              return false;
+            }
+          })->all();
+          $hotels = collect($hotels);
+        }
       }
-      foreach ($query_args as $arg) {
-        $rooms->where('name', 'LIKE', $arg)->orWhereHas('hotel.address', function (Builder $builder) use ($arg) {
-          $builder->where('value', 'LIKE', $arg);
-        });
+      else {
+        $rooms = Room::with(['hotel', 'hotel.address']);
+        if ($request->has('room_moderate')) {
+          $rooms->where('moderate', 1);
+        }
+        foreach ($query_args as $arg) {
+          $rooms->where('name', 'LIKE', $arg)->orWhereHas('hotel.address', function (Builder $builder) use ($arg) {
+            $builder->where('value', 'LIKE', $arg);
+          });
+        }
+
+        foreach ($address as $key => $value) {
+          if (empty($value) || is_null($value))
+            continue;
+          $rooms->whereHas('hotel.address', function (Builder $builder) use ($key, $value) {
+            $builder->where($key, '=', $value);
+          });
+        }
+
+        if ($hotel_type)
+          $rooms->whereHas('hotel', function (Builder $builder) use ($hotel_type) {
+            $builder->where('type_id', $hotel_type);
+          });
+        if ($metro)
+          $rooms->whereHas('hotel.metros', function (Builder $builder) use ($metro) {
+            $builder->whereRaw('LOWER(name) = LOWER(?)', [$metro]);
+          });
+        if ($cost = $this->getCost($request)) {
+          $rooms->whereHas('costs', function (Builder $builder) use ($cost) {
+            $builder->whereHas('period', function (Builder  $b) use ($cost) {
+              $b->where('cost_type_id', $cost['type']);
+            })->where('value', '>', 0);
+            if ($cost['condition'] === 'BETWEEN') {
+              $builder->whereBetween('value', $cost['value']);
+            } else {
+              $builder->where('value', $cost['condition'], $cost['value']);
+            }
+          });
+        }
+        $rooms = $rooms->get();
+        if (count($attributes['room'])) {
+          $rooms = $rooms->map(function ($room) use ($attributes) {
+            $diffs = array_intersect($room->attrs()->pluck('id')->toArray(), $attributes['room']);
+            if (count($diffs) === count($attributes['room']))
+              return $room;
+            return null;
+          })->whereNotNull();
+        }
+        if (isset($attributes['hotel']) && count($attributes['hotel'])) {
+          $rooms = $rooms->map(function ($room) use ($attributes) {
+            $diffs = array_intersect($room->hotel->attrs()->pluck('id')->toArray(), $attributes['hotel']);
+            if (count($diffs) === count($attributes['hotel']))
+              return $room;
+            return null;
+          })->whereNotNull();
+        }
+        if ($hot)
+          $rooms->where('is_hot', '=', true);
+        $hotels = Hotel::whereIn('id', $rooms->pluck('hotel.id')->toArray());
+
+        $hotels = $hotels->get();
       }
 
-      foreach ($address as $key => $value) {
-        if (empty($value) || is_null($value))
-          continue;
-        $rooms->whereHas('hotel.address', function (Builder $builder) use ($key, $value) {
-          $builder->where($key, '=', $value);
-        });
-      }
-
-      if ($hotel_type)
-        $rooms->whereHas('hotel', function (Builder $builder) use ($hotel_type) {
-          $builder->where('type_id', $hotel_type);
-        });
-      if ($metro)
-        $rooms->whereHas('hotel.metros', function (Builder $builder) use ($metro) {
-          $builder->whereRaw('LOWER(name) = LOWER(?)', [$metro]);
-        });
-      if ($cost = $this->getCost($request)) {
-        $rooms->whereHas('costs', function (Builder $builder) use ($cost) {
-          $builder->whereHas('period', function (Builder  $b) use ($cost) {
-            $b->where('cost_type_id', $cost['type']);
-          })->where('value', '>', 0);
-          if ($cost['condition'] === 'BETWEEN') {
-            $builder->whereBetween('value', $cost['value']);
-          } else {
-            $builder->where('value', $cost['condition'], $cost['value']);
-          }
-        });
-      }
-      $rooms = $rooms->get();
-      if (count($attributes['room'])) {
-        $rooms = $rooms->map(function ($room) use ($attributes) {
-          $diffs = array_intersect($room->attrs()->pluck('id')->toArray(), $attributes['room']);
-          if (count($diffs) === count($attributes['room']))
-            return $room;
-          return null;
-        })->whereNotNull();
-      }
-      if (isset($attributes['hotel']) && count($attributes['hotel'])) {
-        $rooms = $rooms->map(function ($room) use ($attributes) {
-          $diffs = array_intersect($room->hotel->attrs()->pluck('id')->toArray(), $attributes['hotel']);
-          if (count($diffs) === count($attributes['hotel']))
-            return $room;
-          return null;
-        })->whereNotNull();
-      }
-      if ($hot)
-        $rooms->where('is_hot', '=', true);
-      $hotels = Hotel::whereIn('id', $rooms->pluck('hotel.id')->toArray());
-
-      $hotels = $hotels->get();
     }
-
     if ($hotel_id = $request->get('hotel', false)) {
       $rooms = $is_room ? $rooms->where('hotel_id', $hotel_id) : $hotels->where('id', $hotel_id)->first()->rooms;
     }
@@ -184,9 +200,14 @@ class SearchController extends Controller
       $hotels = $hotels->forPage($page, $per_page);
       return view('render.hotel.index', compact('hotels'));
     }
-
-    $count = $is_room ? $rooms->count() : $hotels->count();
-
+    if ($moderate) {
+      $count = Hotel::withoutGlobalScope('moderation')
+        ->where('moderate', true)
+        ->where('old_moderate', true)
+        ->count();
+    } else {
+      $count = $is_room ? $rooms->count() : $hotels->count();
+    }
     $title = $with_map ? 'Поиск по карте' : "Результаты поиска <span class=\"count\">($count)</span>";
 
     try {
@@ -195,12 +216,14 @@ class SearchController extends Controller
         @SetCityCoords::set($request);
       }
     } catch (Exception $exception) {
-      if ($request->is('api/*'))
+      if ($request->is('api/*')) {
         return Json::bad(['error' => $exception->getMessage()]);
+      }
     }
 
-    if ($request->is('api/*'))
-      return Json::good(['count' => $count, "is_room" => $is_room]);
+    if ($request->is('api/*')) {
+      return Json::good(['count' => $count]);
+    }
 
     /* START SEO */
 
@@ -438,6 +461,11 @@ class SearchController extends Controller
     }
     $pageDescription->title = $desc_city . $desc_area . $desc_district . $desc_street . $desc_metro . $desc_attr;
 
+    if ($moderate) {
+      $title = 'На модерации' . "<span class=\"count\">($count)</span>";
+      $pageDescription->title = 'На модерации' . "<span class=\"count\">($count)</span>";
+    }
+
     // 'city' => @$queryAddress['city'],
     // 'area' => @$queryAddress['city_area'],
     // 'district' => @$queryAddress['city_district'],
@@ -450,9 +478,8 @@ class SearchController extends Controller
     }
 
     /* END SEO */
-    // return dd('end');
 
-    return view('web.search', compact('hotels', 'query', 'rooms', 'with_map', 'title', 'attributes', 'address', 'request', 'pageDescription'));
+    return view('web.search', compact('hotels', 'moderate', 'query', 'rooms', 'with_map', 'title', 'attributes', 'address', 'request', 'pageDescription'));
   }
 
   public function hint(Request $request)

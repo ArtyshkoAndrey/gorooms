@@ -69,7 +69,13 @@ class CreateUserInHotel extends Notification
    */
   public function toMail ($notifiable): MailMessage
   {
-    return (new MailMessage)->greeting('Привет!')->subject('Для вас был создан аккаунт')->line('Для вас был создан аккаунт в сервисе Gorooms')->line('Логин: ' . $this->user->email)->line('Пароль: ' . $this->password)->line('Вы были привязаны к отелю "' . $this->hotel->name . '"');
+    return (new MailMessage)
+      ->greeting('Привет!')
+      ->subject('Для вас был создан аккаунт')
+      ->line('Для вас был создан аккаунт в сервисе Gorooms')
+      ->line('Логин: ' . $this->user->email)
+      ->line('Пароль: ' . $this->password)
+      ->line('Вы были привязаны к отелю "' . $this->hotel->name . '"');
   }
 
   /**

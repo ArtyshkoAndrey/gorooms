@@ -1,7 +1,7 @@
 @php
   use App\Models\RatingCategory;use Illuminate\Support\Facades\Cache;$rating_categories = Cache::remember('rating_category', 60*60*24*12, function () {
       return RatingCategory::orderBy('sort')->get();
-  })
+  });
 @endphp
 <div class="card-wrapper">
   <div class="room-card room-card-horizontal">
@@ -31,25 +31,41 @@
         </div>
       </div>
     </div>
-    <div class="room-card-slider swiper-container js-hotel-card-slider">
-      <div class="swiper-wrapper">
-        @foreach($room->images AS $key => $image)
-          <div class="swiper-slide">
-            <img class="swiper-lazy" data-src="{{ asset($image->path) }}" alt="{{ $room->name }}"
-                 src="{{ asset('img/pr578x340.jpg') }}"
-                 title="{{ $room->name . ' | GoRooms.ru' . ($loop->iteration > 1 ? ' - фото ' . $loop->iteration : '') }}">
-          </div>
-        @endforeach
-      </div>
-      <div class="swiper-button swiper-button-next"></div>
-      <div class="swiper-button swiper-button-prev"></div>
+    <div class="room-card-slider swiper-container {{$room->moderate ? '' : 'js-hotel-card-slider'}}">
+      @if($room->moderate)
+        <div class="swiper-slide">
+          <img class="swiper-lazy"
+               src="{{ asset('img/hotel-moderate.jpg') }}" alt="moderate">
+        </div>
+      @else
+        <div class="swiper-wrapper">
+          @foreach($room->images AS $key => $image)
+            <div class="swiper-slide">
+              <img class="swiper-lazy" data-src="{{ asset($image->path) }}" alt="{{ $room->name }}"
+                   src="{{ asset('img/pr578x340.jpg') }}"
+                   title="{{ $room->name . ' | GoRooms.ru' . ($loop->iteration > 1 ? ' - фото ' . $loop->iteration : '') }}">
+            </div>
+          @endforeach
+        </div>
+        <div class="swiper-button swiper-button-next"></div>
+        <div class="swiper-button swiper-button-prev"></div>
+      @endif
     </div>
 
     <div class="room-card-in">
       <div class="room-card-content">
         <a href="{{ route('hotels.show', $room->hotel) }}#room-{{ $room->id }}" class="room-card-header">
-          <p class="room-card-title">Номер: {{ $room->name }}</p>
-          <p class="room-card-type">{{ optional($room->category)->name }}</p>
+          @if ($room->number || $room->name)
+            @if ($room->number)
+              <p class="room-card-title">Номер: ({{ $room->number }}) {{ $room->name }}</p>
+            @else
+              <p class="room-card-title">Номер: {{ $room->name }}</p>
+            @endif
+            <p class="room-card-type">{{ optional($room->category)->name }}</p>
+          @else
+            <p class="room-card-title">Номер: {{  $room->category->name ?? '' }}</p>
+            <p class="room-card-type">Доступно: {{ $room->category->value ?? '' }} номеров</p>
+          @endif
         </a>
         <a href="{{ route('hotels.show', $room->hotel) }}" class="room-card-name">Отель
           “{{ $room->hotel->name }}”</a>
@@ -119,16 +135,21 @@
           @foreach($room->all_costs AS $cost)
             <li class="room-card-prices-item">
               @if(isset($cost->period))
-              <div>
-                <p class="room-card-prices-item-title">{{ $cost->period->type->name }}</p>
-                <p class="room-card-prices-item-price">@if($cost->value !== '0'){{ $cost->value }}
-                  руб.@endif</p>
-                @if(isset($cost->period->info))
-                  {{$cost->period->info}}
-                @endif
-              </div>
+                <div style="width: 100%">
+                  <p class="room-card-prices-item-title">{{ $cost->period->type->name }}</p>
+                  <p class="room-card-prices-item-price">
+                    @if((int) $cost->value === 0)
+                      Не предоставляется
+                    @else
+                      {{ $cost->value }} руб.
+                    @endif
+                  </p>
+                  @if(isset($cost->period->info) && (int) $cost->value !== 0)
+                    {{$cost->period->info}}
+                  @endif
+                </div>
               @else
-                <div>
+                <div style="width: 100%">
                   <p class="room-card-prices-item-title">{{ $cost->type->name }}</p>
                   <p class="room-card-prices-item-price">{{ $cost->value }}</p>
                 </div>
@@ -138,6 +159,7 @@
         </ul>
       </a>
       <div class="room-card-btns">
+        @if(!$room->moderate)
         <a href="" class="btn btn-orange btn-block" data-href="#book-popup" data-toggle="modal"
            data-target="#book-popup" data-action="{{ route('booking.room', $room->id) }}"
            onclick="showFormBookRoom('{{$room->id}}')">Забронировать</a>
@@ -150,7 +172,7 @@
                             </p>
                         @endif
         @moderator
-        <a href="{{ route('moderator.room.edit', $hotel->id) }}" class="btn btn-orange btn-block btn-moderator-edit">Редактировать</a>
+          <a href="{{ route('moderator.room.edit', $hotel->id) }}" class="btn btn-orange btn-block {{ !$room->moderate ? 'btn-moderator-edit' : '' }}">Редактировать</a>
         @endmoderator
       </div>
     </div>

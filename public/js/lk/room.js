@@ -21,6 +21,15 @@ function allowedEditRoom ()  {
   $(this).parents('.shadow').find('.sortable').sortable('enable');
   $(this).parents('.shadow').find('.uploud-photo').show()
   $(this).parents('.shadow').find('.save-room').show()
+
+  let shadow = $(this).parents('.shadow')
+  showPeriodsInShadow(shadow)
+
+
+  blockSaveRoom(shadow)
+
+  $(shadow).find('input').change(blockSaveRoom.bind(null, shadow))
+
   $(this).hide()
 }
 
@@ -52,7 +61,7 @@ function saveRoom () {
       .then(response => {
         if (response.data.success) {
           saveFrontData.call(this)
-          if (!response.data.room.moderate) {
+          if (response.data.room.moderate) {
             $(shadow).find('.row__head')
               .removeClass('row__head_blue')
             $(shadow).find('.quote__status')
@@ -83,8 +92,12 @@ function saveRoom () {
 /**
  * Сохранение комнаты, фронт
  */
-function saveFrontData () {
-  if ($(this).parents('.shadow').find('.dz-image-preview').length !== 0 || $(this).parents('.shadow').attr('data-moderate') === 'moderate') {
+function saveFrontData (save = false) {
+  if ($(this).parents('.shadow').find('.dz-image-preview').length !== 0 ||
+    $(this).parents('.shadow').attr('data-moderate') === 'moderate' ||
+    save
+  ) {
+
     let shadow = $(this).parents('.shadow')
     $(shadow).find('.remove-btn').hide()
     $(this).hide()
@@ -113,6 +126,8 @@ function saveFrontData () {
       .text()
     category = category === 'Категория' ? '' : category
 
+    hidePeriodsInShadow(shadow);
+
     $($(shadow).find('.head-text').get(0)).html('#' + order)
     $($(shadow).find('.head-text').get(1)).html('№' + number)
     $($(shadow).find('.head-text').get(2)).html(name)
@@ -126,7 +141,6 @@ function saveFrontData () {
 function removeRoom () {
   let shadow = $(this).parents('.shadow').get(0)
 //  axios
-//  TODO: delete variable uploader and existFile
   let url = $(shadow).find('input[name=url-delete]').val()
   let id = shadow.dataset.id
   axios.delete(url)
@@ -178,6 +192,9 @@ function createRoom () {
 
         select_item.bind('click', selectItem)
         select_top.bind('click', selectTop)
+
+        $('input.has-validate-error').keyup(validateErrorBootstrap)
+        $('input.has-validate-error').unbind('onclick').click(validateErrorBootstrap)
 
         $('.sortable').sortable({
           items: '.dz-image-preview',

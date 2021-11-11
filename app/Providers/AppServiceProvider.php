@@ -7,9 +7,11 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
+
   public static function setProp($first, $second, $prop)
   {
     if ($first === $second) {
@@ -38,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
   public function boot(): void
   {
     Schema::defaultStringLength(191);
+    Paginator::useBootstrap();
     $this->bootBuilderMacroses();
     $this->makeDirectives();
   }

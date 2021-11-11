@@ -59,7 +59,6 @@ class RoomController extends Controller
       $room = $this->saveDataTypeRoom($request->all(), $room);
     }
 
-    $room->moderate = true;
     $room->category()->associate($request->get('category'));
     $room->costs()->delete();
 
@@ -141,7 +140,7 @@ class RoomController extends Controller
     $room->attrs()->sync($request->get('ids'));
     $room->save();
 
-    return response()->json(['success' => true]);
+    return response()->json(['success' => true, 'room' => $room]);
   }
 
   /**

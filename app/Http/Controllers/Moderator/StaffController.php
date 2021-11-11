@@ -17,7 +17,7 @@ use Swift_TransportException;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\LK\StaffRequest;
+use App\Http\Requests\Moderate\StaffRequest;
 use Illuminate\Contracts\View\Factory;
 use App\Notifications\CreateUserInHotel;
 use App\Notifications\UpdateRandomPasswordUser;
@@ -71,7 +71,6 @@ class StaffController extends Controller
   public function remove (int $staff_id): RedirectResponse
   {
     try {
-      //      TODO: Если удаляют юзеров который самый клавный, то меняем главного на первого general
       $user = User::findOrFail($staff_id);
 
       //    Если у удаляемого юзера прописано что он создатель отеля то...

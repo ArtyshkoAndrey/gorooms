@@ -24,6 +24,11 @@ class HotelObserver
   public function created(Hotel $hotel): void
   {
     Cache::flush();
+
+    $hotel->moderate = true;
+    $hotel->old_moderate = false;
+    $hotel->show = false;
+    $hotel->save();
   }
 
   /**

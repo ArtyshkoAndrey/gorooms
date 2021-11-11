@@ -25,6 +25,14 @@ function allowedEditRoom()
   $(this).parents('.shadow').find('.save-room').show()
   $(this).hide()
 
+  let shadow = $(this).parents('.shadow')
+
+  showPeriodsInShadow(shadow)
+
+  blockSaveRoom(shadow)
+
+  $(shadow).find('input').change(blockSaveRoom.bind(null, shadow))
+
   updateArrow()
 }
 
@@ -198,6 +206,8 @@ function saveFrontData (save = false)
     $(shadow).find('.upload__remove').hide()
     $(shadow).find('.sortable').sortable('disable');
     $(shadow).find('.uploud-photo').hide()
+
+    hidePeriodsInShadow(shadow);
   }
 }
 
@@ -256,6 +266,9 @@ function createFrontData (room_id, category)
   $('.quote__read').unbind("click").bind('click', allowedEditRoom)
 
   $('.quote__remove').unbind("click").bind('click', removeRoom)
+
+  $('input.has-validate-error').keyup(validateErrorBootstrap)
+  $('input.has-validate-error').unbind('onclick').click(validateErrorBootstrap)
 
   let urlVal = $(room).find('input[name=url-delete]').val()
   $(room).find('input[name=url-delete]').val(urlVal + '/' + room_id)

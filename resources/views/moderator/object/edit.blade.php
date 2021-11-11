@@ -9,9 +9,12 @@
           <h2 class="title title_blue">Объект</h2>
         </div>
       </div>
-      <div class="row part__middle">
-        <div class="col-12">
+      <div class="row part__middle justify-content-between">
+        <div class="col-auto">
           <p class="heading">Название: {{ $hotel->name }}</p>
+        </div>
+        <div class="col-auto">
+          <p class="{{ $hotel->moderate ? 'text-danger' : 'text-success' }}">{{ $hotel->moderate ? 'На проверке' : 'Проверен' }}</p>
         </div>
       </div>
       <div class="row">
@@ -109,9 +112,9 @@
           <div class="text editor__text">
             {!! $hotel->description !!}
           </div>
-          <textarea id="editor2" class="h-auto" name="description" placeholder="Введите текст">
-          {!! $hotel->description !!}
-        </textarea>
+          <textarea id="editor2" rows="8" class="h-auto field form-control" name="description" placeholder="Введите текст">
+            {{ $hotel->description }}
+          </textarea>
         </div>
       </div>
       <div class="row part__bottom">
@@ -126,7 +129,7 @@
 </section>
 
   {{-- Как добраться --}}
-  <section class="part ck-editor_hidden ck-editor__show">
+  <section class="part ck-editor_hidden">
     <div class="container">
       <div class="row part__top">
         <div class="col-12">
@@ -142,8 +145,8 @@
             <div class="text editor__text">
               {!! $hotel->route !!}
             </div>
-            <textarea id="editor" class="h-auto" name="route" placeholder="Введите текст">
-              {!! $hotel->route !!}
+            <textarea id="editor" rows="8" class="h-auto field form-control" name="route" placeholder="Введите текст">
+              {{ $hotel->route }}
             </textarea>
           </div>
         </div>
@@ -189,7 +192,6 @@
                        name="metros_color[]"
                        value="{{ $m->color }}">
                 <input type="number"
-                       {{ $hotel->disabled_save }}
                        min="1"
                        name="metros_time[]"
                        value="{{ $m->distance }}"
@@ -199,7 +201,6 @@
                 <button onclick="deleteMetro({{ $m->id }})"
                         type="button"
                         class="mx-3 button button_blue w-auto px-3"
-                    {{ $hotel->disabled_save }}
                 >
                   -
                 </button>
@@ -210,17 +211,15 @@
               <div class="d-flex align-items-center station">
                 <div class="select" style="width: 45%">
                   <select name="metros[]"
-                          {{ $hotel->disabled_save }}
                           class="form-control field metros w-100"
                           required>
                   </select>
                 </div>
                 <input type="hidden" name="metros_color[]">
-                <input type="number" min="1" {{ $hotel->disabled_save }} name="metros_time[]"
+                <input type="number" min="1" name="metros_time[]"
                        class="field field_small station-field" required>
                 <p class="text">минут пешком до объекта</p>
                 <button onclick="deleteMetro(1)"
-                        {{ $hotel->disabled_save }}
                         type="button"
                         class="mx-3 button button_blue w-auto px-3">
                   -
@@ -233,7 +232,7 @@
         <div class="row part__bottom">
           <div class="col-12">
             <button onclick="addMetro()"
-                    {{ $hotel->disabled_save }}
+                    {!! $hotel->metros()->count() >= 3 ? 'style="display: none"' : '' !!}
                     type="button" class="button button_blue"
             >
               Добавить станцию
@@ -249,7 +248,6 @@
         <div class="row part__bottom">
           <div class="col-12">
             <button class="button button_blue"
-                    {{ $hotel->disabled_save }}
                     type="submit">
               Сохранить
             </button>
@@ -329,7 +327,7 @@
                              name="attr[{{ $attr->id }}]"
                           {{ $hotel->attrs->contains('id', $attr->id) ? 'checked' : '' }}
                       >
-                      <div class="check" {{ $hotel->disabled_save }}>
+                      <div class="check">
                         <div class="check__flag check__flag_blue"></div>
                       </div>
                       <label for="attr-{{ $attr->id }}">{{ $attr->name }}</label>
@@ -400,17 +398,11 @@
       </div>
 
       <div class="row part__content">
-        @if($hotel->moderate || !$hotel->show)
+        @if($hotel->moderate)
           <div class="col-auto">
             <form action="{{ route('moderator.object.upload', $hotel->id) }}" method="post">
               @csrf
               <button type="submit" class="button button_blue" {{ $hotel->rooms()->count() <= 0 ? 'disabled' : '' }}>Опубликовать <i class="fa fa-upload d-block ml-3"></i></button>
-            </form>
-          </div>
-          <div class="col-auto">
-            <form action="{{ route('moderator.object.unupload', $hotel->id) }}" method="post">
-              @csrf
-              <button type="submit" class="button button_blue">Уведомить об ошибках</button>
             </form>
           </div>
         @endif
@@ -450,7 +442,7 @@
       <div class="d-flex align-items-center case_2">
         <input type="phone" class="field" name="phone" value="{{ $hotel->phone }}" required placeholder="Телефон 1 объекта">
         <input type="phone" class="field" name="phone_2" value="{{ $hotel->phone_2 }}" placeholder="Телефон 2 объекта">
-        <input type="text" class="field" name="email" value="{{ $hotel->email }}" required placeholder="E-mail">
+        <input type="email" class="field" name="email" value="{{ $hotel->email }}" required placeholder="E-mail">
       </div>
 
       <button type="submit" class="button button_blue">Сохранить</button>
@@ -484,6 +476,11 @@
   <script>
     $(document).ready(function () {
       selectInit()
+
+      $('.uploud').sortable({
+        items: '.uploud__item',
+        update: updateOrderPhotos
+      });
     })
 
     $("#address").suggestions({
@@ -569,7 +566,7 @@
     let metros_ids = {{ $hotel->metros->pluck('distance')->max() ?? 1 }};
 
     let count_metros = {{ $hotel->metros()->count() > 0 ? $hotel->metros()->count() : 1 }};
-
+    $("input[type='phone']").mask("+7 (999) 999 99-99");
     $("input[name*='attr'][type='checkbox']").on( "change", function() {
       console.log(2);
       if (+$("input[name*='attr'][type='checkbox']:checked").length > 9)

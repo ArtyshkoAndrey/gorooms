@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Route;
-use Cache;
-use Eloquent;
 use App\Traits\UseImages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Traits\CreatedAtOrdered;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -20,34 +19,37 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * App\Models\Room
  *
- * @property int $id
- * @property string $name
- * @property int $moderate
- * @property string|null $description
- * @property int $hotel_id
- * @property Carbon|null $deleted_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property int $is_hot
+ * @property int                         $id
+ * @property string|null                 $name
+ * @property int|null                    $number
+ * @property int|null                    $order
+ * @property int|null                    $category_id
+ * @property bool                        $moderate
+ * @property string|null                 $description
+ * @property int                         $hotel_id
+ * @property string|null                 $deleted_at
+ * @property Carbon|null                 $created_at
+ * @property Carbon|null                 $updated_at
+ * @property bool                        $is_hot
  * @property-read Collection|Attribute[] $attrs
- * @property-read int|null $attrs_count
- * @property-read Collection|Cost[] $costs
- * @property-read int|null $costs_count
- * @property-read mixed $meta_description
- * @property-read mixed $meta_keywords
- * @property-read mixed $meta_title
- * @property-read Hotel $hotel
- * @property-read Image $image
- * @property-read Collection|Image[] $images
- * @property-read int|null $images_count
- * @property-read PageDescription $meta
- * @method static bool|null forceDelete()
+ * @property-read int|null               $attrs_count
+ * @property-read Category|null          $category
+ * @property-read Collection|Cost[]      $costs
+ * @property-read int|null               $costs_count
+ * @property-read mixed                  $all_costs
+ * @property-read string|null            $meta_description
+ * @property-read string|null            $meta_keywords
+ * @property-read string|null            $meta_title
+ * @property-read Hotel                  $hotel
+ * @property-read Image                  $image
+ * @property-read Collection|Image[]     $images
+ * @property-read int|null               $images_count
+ * @property-read PageDescription|null   $meta
  * @method static Builder|Room hot()
  * @method static Builder|Room newModelQuery()
  * @method static Builder|Room newQuery()
- * @method static \Illuminate\Database\Query\Builder|Room onlyTrashed()
  * @method static Builder|Room query()
- * @method static bool|null restore()
+ * @method static Builder|Room whereCategoryId($value)
  * @method static Builder|Room whereCreatedAt($value)
  * @method static Builder|Room whereDeletedAt($value)
  * @method static Builder|Room whereDescription($value)
@@ -56,17 +58,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static Builder|Room whereIsHot($value)
  * @method static Builder|Room whereModerate($value)
  * @method static Builder|Room whereName($value)
- * @method static Builder|Room whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|Room withTrashed()
- * @method static \Illuminate\Database\Query\Builder|Room withoutTrashed()
- * @mixin Eloquent
- * @property int|null $number
- * @property int|null $order
- * @property int|null $category_id
- * @method static Builder|Room whereCategoryId($value)
  * @method static Builder|Room whereNumber($value)
  * @method static Builder|Room whereOrder($value)
- * @property-read Category|null $category
+ * @method static Builder|Room whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class Room extends Model
 {
@@ -83,12 +78,12 @@ class Room extends Model
     'order',
     'moderate',
     'description',
-    'is_hot'
+    'is_hot',
   ];
 
   protected $casts = [
     'moderate' => 'boolean',
-    'is_hot' => 'boolean'
+    'is_hot' => 'boolean',
   ];
 
   protected $with = [
@@ -148,16 +143,11 @@ class Room extends Model
     return $query->where('is_hot', true);
   }
 
-  public function costs(): HasMany
-  {
-    return $this->hasMany(Cost::class, 'room_id', 'id');
-  }
-
-  public function getAllCostsAttribute()
+  public function getAllCostsAttribute(): Collection
   {
     $costs = $this->costs()->with('period.type')->get()->sortBy('type.sort');
 
-    $types = Cache::remember('types', 60*60*24*12, function () {
+    $types = Cache::remember('types', 60 * 60 * 24 * 12, function () {
       return CostType::orderBy('sort')->get();
     });
 
@@ -166,9 +156,9 @@ class Room extends Model
     foreach ($types as $type) {
       $check = $costs->contains('period.type.id', $type->id);
       if (!$check) {
-        $cost = (object) [
+        $cost = (object)[
           'type' => $type,
-          'value' => 'Не предоставляется'
+          'value' => 'Не предоставляется',
         ];
         $collection->add($cost);
       } else {
@@ -178,6 +168,11 @@ class Room extends Model
     }
 
     return $collection;
+  }
+
+  public function costs(): HasMany
+  {
+    return $this->hasMany(Cost::class, 'room_id', 'id');
   }
 
   public function attachMeta(Request $request): Room

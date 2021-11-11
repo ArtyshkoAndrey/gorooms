@@ -57,10 +57,11 @@ class Image extends Model
   protected $fillable = [
     'name',
     'path',
-    'default',
-    'moderate'
+    'moderate',
+    'order'
   ];
 
+//  TODO: Переписать алгоритм загузки фотки что бы order становился автоматом последний
   public static function upload($request, &$uploadTo, $attr_name = 'image'): array
   {
     if ($request->hasFile($attr_name)) {
@@ -69,21 +70,22 @@ class Image extends Model
         $files = [$files];
       }
       $images = [];
-      $is_default = true;
-      if ($uploadTo->image()->count() !== 0) {
-        $is_default = false;
+      if ($uploadTo->images()->count() === 0) {
+        $order = 1;
+      } else {
+        $order = $uploadTo->images->last()->order + 1;
       }
       foreach ($files as $file) {
         $path = $file->store(date('Y/m/d'));
         $image = new Image();
         $image->name = $file->getClientOriginalName();
         $image->path = 'storage/' . $path;
-        $image->default = $is_default;
         $image->moderate = !(Auth::user()->is_moderate || Auth::user()->is_admin);
+        $image->order = $order;
         $image->save();
         $images[] = $image;
         // self::watermark($uploadTo, $image);
-        $is_default = false;
+        $order++;
       }
       $uploadTo->images()->saveMany($images);
       $uploadTo->save();
@@ -142,12 +144,12 @@ class Image extends Model
 
   public static function beforeSave(Image $image): void
   {
-    if ($image->default) {
-      $model_id = $image->model_id;
-      $model_type = $image->model_type;
+//    if ($image->default) {
+//      $model_id = $image->model_id;
+//      $model_type = $image->model_type;
 
-      self::where('model_id', $model_id)->where('model_type', $model_type)->update(['default' => false]);
-    }
+//      self::where('model_id', $model_id)->where('model_type', $model_type)->update(['default' => false]);
+//    }
   }
 
   /**

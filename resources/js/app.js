@@ -83,31 +83,6 @@ window.deleteImage = function (image) {
         }
     };
 
-window.setDefault = function (image) {
-        let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        fetch('/admin/api/image/' + image + '/set_default', {
-            method: 'get',
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-Token": token
-            }
-        }).then(response => {
-            return response.json()
-        }).then(response => {
-            if (response.success) {
-                let images = document.querySelectorAll('.images img');
-                for (let j = 0; j < images.length; j++)
-                    images[j].removeAttribute('style');
-
-                document.querySelector('#image_' + image + ' img').style.border = "2px solid black";
-            }
-
-        });
-    };
-
 let image_field = document.getElementsByClassName('js-autoload')[0];
 image_field.addEventListener('change', event => {
     let form_data = new FormData();
@@ -136,9 +111,7 @@ image_field.addEventListener('change', event => {
                 img.src = '\\' + image.path;
                 img.classList.add('img-fluid', 'img-thumbnail');
                 btn_group.classList.add('btn-group', 'btn-group-sm', 'w-100', 'mt-1');
-                btn_group.innerHTML = `<button type="button" class="btn btn-primary" onclick="window.setDefault(${image.id})">
-                        <i class="fa fa-check-square-o" aria-hidden="true"></i>
-                    </button>
+                btn_group.innerHTML = `
                     <button type="button" class="btn btn-danger" onclick="window.deleteImage(${image.id})">
                         <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>`;

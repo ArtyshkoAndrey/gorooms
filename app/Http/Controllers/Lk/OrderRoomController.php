@@ -8,6 +8,7 @@
 namespace App\Http\Controllers\Lk;
 
 use App\Models\Room;
+use App\Models\Hotel;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 
@@ -16,15 +17,15 @@ class OrderRoomController extends Controller
 
   public function upOrder(int $id): JsonResponse
   {
-    $room = Room::findOrFail($id);
+    $room = Room::withoutGlobalScope('moderation')->findOrFail($id);
 
     $oldOrder = $room->order;
 
-    $hotel = $room->hotel;
+    $hotel = Hotel::withoutGlobalScope('moderation')->find($room->hotel_id);
 
-    $upperRoom = Room::where('order', '<', $oldOrder)
+    $upperRoom = Room::withoutGlobalScope('moderation')->where('order', '<', $oldOrder)
       ->whereHas('hotel', function ($q) use ($hotel) {
-        $q->whereId($hotel->id);
+        $q->withoutGlobalScope('moderation')->whereId($hotel->id);
       })
       ->orderByDesc('order')
       ->first();
@@ -50,15 +51,16 @@ class OrderRoomController extends Controller
 
   public function downOrder(int $id): JsonResponse
   {
-    $room = Room::findOrFail($id);
+    $room = Room::withoutGlobalScope('moderation')->findOrFail($id);
 
     $oldOrder = $room->order;
 
-    $hotel = $room->hotel;
+    $hotel = Hotel::withoutGlobalScope('moderation')->find($room->hotel_id);
 
-    $upperRoom = Room::where('order', '>', $oldOrder)
+
+    $upperRoom = Room::withoutGlobalScope('moderation')->where('order', '>', $oldOrder)
       ->whereHas('hotel', function ($q) use ($hotel) {
-        $q->whereId($hotel->id);
+        $q->withoutGlobalScope('moderation')->whereId($hotel->id);
       })
       ->orderBy('order')
       ->first();

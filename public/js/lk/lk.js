@@ -332,11 +332,16 @@ $('.remove-photo').bind('click', function () {
         .then(r => {
           if (r.data.success) {
             $(item).remove()
+
+
+            if (typeof updateOrderPhotos === 'function') {
+              updateOrderPhotos();
+            }
           } else {
-            alert('Ошибка удаления фоток')
+            alert(r.data.payload.error)
           }
         })
-        .catch(e => { alert(e.response.data) })
+        .catch(e => { $(item).remove(); alert('Ошибка удаления фотографии') })
     } else {
       console.log(2)
       alert('Ошибка удаления фоток')
@@ -344,6 +349,13 @@ $('.remove-photo').bind('click', function () {
   } else {
     console.log(1)
     alert('Ошибка удаления фоток')
+  }
+
+  if ($(item).parents('.shadow').length > 0) {
+    let shadow = $(item).parents('.shadow');
+    setTimeout(() => {
+      blockSaveRoom(shadow)
+    }, 1000)
   }
 
 })
@@ -378,32 +390,32 @@ if (typeof saveRoom === 'function') {
 /**
  * При поднятии клавиши клавиатуры в поле email
  */
-$('input[type="email"]').bind('keyup', function () {
-  let email = $(this).val();
-  if (!validateEmail(email)) {
-
-    $(this).css('border', '1px solid orange')
-
-  } else if (validateEmail(email)) {
-    $(this).css('border', '1px solid #2f64ad')
-
-  }
-})
+// $('input[type="email"]').bind('keyup', function () {
+//   let email = $(this).val();
+//   if (!validateEmail(email)) {
+//
+//     $(this).css('border', '1px solid orange')
+//
+//   } else if (validateEmail(email)) {
+//     $(this).css('border', '1px solid #2f64ad')
+//
+//   }
+// })
 
 /**
  * При поднятии клавиши клавиатуры в поле телефон
  */
-$('input[type="phone"]').bind('keyup', function () {
-  let phone = $(this).val();
-  if (!validatePhone(phone)) {
-
-    $(this).css('border', '1px solid orange')
-
-  } else if (validatePhone(phone)) {
-    $(this).css('border', '1px solid #2f64ad')
-
-  }
-})
+// $('input[type="phone"]').bind('keyup', function () {
+//   let phone = $(this).val();
+//   if (!validatePhone(phone)) {
+//
+//     $(this).css('border', '1px solid orange')
+//
+//   } else if (validatePhone(phone)) {
+//     $(this).css('border', '1px solid #2f64ad')
+//
+//   }
+// })
 
 /**
  * Валидация Email
@@ -454,10 +466,17 @@ function selectItem() {
     let input = $(this).parent('.select__hidden').siblings('input[type="hidden"]')
 
     $(input).val(this.dataset.id)
+    $(input).change();
 
     $(this).parent('.select__hidden').slideUp()
     $(this).parent('.select__hidden').siblings('.select__top').find('.select__current').text($(this).text())
     $(this).parent('.select__hidden').siblings('.select__top').find('.select__arrow').removeClass('open')
+  }
+
+  console.log($(this).parents('.select').first().hasClass('has-validate-error-select'), $(this).parents('.select'))
+
+  if ($(this).parents('.select').first().hasClass('has-validate-error-select')) {
+    $(this).parents('.select').first().find('.select__top').removeClass('is-invalid form-control')
   }
 }
 
@@ -705,8 +724,10 @@ function savePopupAttributesRoom () {
   if (room_id) {
     let attributes = $(popup).find('input[name*="attr"][type="checkbox"]:checked')
     let ids = [];
+    let names = [];
     attributes.each(function () {
       console.log($(this).val())
+      names.push($(this).first().attr('data-placeholder'))
       ids.push($(this).val())
     })
 
@@ -715,7 +736,7 @@ function savePopupAttributesRoom () {
       return 0;
     }
 
-    backEndSaveAttributesRoom(room_id, ids, popup)
+    backEndSaveAttributesRoom(room_id, ids, popup, names)
   } else {
     alert('Ошибка в определении выбранной комнаты')
     return 0;
@@ -728,8 +749,9 @@ function savePopupAttributesRoom () {
  * @param {Number} room_id
  * @param {[Number]} ids
  * @param {HTMLElement} popup
+ * @param {[String]} names
  */
-function backEndSaveAttributesRoom (room_id, ids, popup) {
+function backEndSaveAttributesRoom (room_id, ids, popup, names) {
   let room = $('.shadow[data-id=' + room_id + ']')
 
   let urlAttrPut = $(room).find('input[name=attributes-put]').val()
@@ -740,12 +762,94 @@ function backEndSaveAttributesRoom (room_id, ids, popup) {
     })
     .then(r => {
       if (r.data.success) {
+        let list = $('.shadow[data-id=' + room_id + ']').find('.attributes-list')
+        list = $(list)
+        list.empty()
+        names.forEach((name, index) => {
+          if (names.length !== index + 1) {
+            list.append('<span>' + name + ', </span>')
+          } else {
+          list.append('<span>' + name + '</span>')
+          }
+        })
+
+        $('.shadow[data-id=' + room_id + ']').find('.more-details').find('p.text').removeClass('is-invalid form-control')
+
+        if (r.data.room.moderate) {
+          $(room).find('.row__head')
+            .removeClass('row__head_blue')
+          $(room).find('.quote__status')
+            .text('Проверка модератором')
+          $(room).find('.quote__status')
+            .removeClass('quote__status_blue')
+            .addClass('quote__status_red')
+        }
+
         $(popup).find('.close-this').click()
       }
     })
     .catch(e => {
       alert('Ошибка в сохранении атрибутов')
     })
+}
+
+/**
+ * Валидация полей
+ *
+ */
+function validateErrorBootstrap() {
+  let el = $(this)
+  if (el.val().trim() === '') {
+    el.addClass('is-invalid form-control')
+  } else {
+    el.removeClass('is-invalid form-control')
+  }
+}
+
+/**
+ * Прячет периоды при сохранении
+ *
+ * @param {HTMLElement} shadow
+ */
+function hidePeriodsInShadow(shadow) {
+  $(shadow).find('.hours__select').hide();
+  let i = 0;
+  $(shadow).find('.hours__select').each(function () {
+    let text = $(this).find('.select__current').text()
+    $($(shadow).find('.hours__after').get(i)).text(text)
+    i++;
+  })
+  $(shadow).find('.hours__after').show();
+}
+
+/**
+ * Показывает время периодов
+ *
+ * @param {HTMLElement} shadow
+ */
+function showPeriodsInShadow(shadow) {
+  $(shadow).find('.hours__after').hide();
+  $(shadow).find('.hours__select').show();
+}
+
+function blockSaveRoom (shadow) {
+  let flag = true;
+  console.log(shadow)
+  $(shadow).find('input').each( function () {
+    if ($(this).val().trim() === '') {
+      flag = false
+    }
+  })
+
+  if( $(shadow).find('.visualizacao').find('li').length < 1) {
+    flag = false
+  }
+
+  if (flag) {
+    $(shadow).find('#saveRoom').removeAttr('disabled');
+  } else {
+    $(shadow).find('#saveRoom').prop("disabled", true);
+  }
 }
 
 let arrow_up = $('.arrow-up')
@@ -764,4 +868,45 @@ setTimeout( () => {
 
 if (typeof updateArrow === 'function') {
   updateArrow()
+}
+
+$('input.has-validate-error').keyup(validateErrorBootstrap)
+
+$('input.has-validate-error').click(function () {
+  $(this).keyup()
+})
+
+$('input.has-validate-error').each(validateErrorBootstrap)
+
+$('div.has-validate-error-select').each(function () {
+  let input = $(this).find('input')
+  input = $(input)
+
+  if (input.val() === '') {
+    $(this).find('.select__top').addClass('form-control is-invalid')
+  } else {
+    $(this).find('.select__top').removeClass('form-control is-invalid')
+  }
+})
+
+
+/**
+ * Обновление порядка фотографий для модераторов
+ *
+ */
+function updateOrderPhotos () {
+  let ids = [];
+  $(".uploud li").each(function(i) {
+    ids.push($(this).attr('data-image-id'))
+  });
+  console.log(ids)
+
+  axios.post('/api/images/ordered', {
+    ids
+  })
+    .catch(e => {
+      if (e.response.data.message) {
+        alert(e.response.data.message)
+      }
+    })
 }

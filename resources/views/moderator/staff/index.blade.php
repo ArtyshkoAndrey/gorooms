@@ -26,7 +26,7 @@
           @if ($user->pivot->hotel_position === App\User::POSITION_GENERAL)
             <div class="col-4 mt-2">
               <div class="staff-item staff-item_general" data-id="{{ $user->id }}">
-                <div class="staff-item__name">{{ App\User::POSITIONS_LANGUAGE[$user->pivot->hotel_position] }}</div>
+                <div class="staff-item__name staff-item__name_blue">{{ App\User::POSITIONS_LANGUAGE[$user->pivot->hotel_position] }}</div>
                 <div class="staff-item__bottom">
                   <p class="staff-item__text">{{ $user->position }}</p>
                   <p class="staff-item__text">{{ $user->phone }}</p>
@@ -44,7 +44,7 @@
                  data-id="createUser"
                  data-position="{{ App\User::POSITION_GENERAL }}"
                  data-position-language="{{ App\User::POSITIONS_LANGUAGE[App\User::POSITION_GENERAL] }}">
-              <div class="staff-item__name staff-item__name_blue">General</div>
+              <div class="staff-item__name">General</div>
               <div class="staff-item__bottom">
                 <p class="staff-item__text">Директор</p>
                 <p class="staff-item__text">+7 ( _ _ _ ) _ _ _ _ _ _</p>
@@ -59,7 +59,7 @@
           @if ($user->pivot->hotel_position === App\User::POSITION_STAFF)
             <div class="col-4 mt-2">
               <div class="staff-item staff-item_small staff-item_staff" data-id="{{ $user->id }}">
-                <div class="staff-item__name">{{ App\User::POSITIONS_LANGUAGE[$user->pivot->hotel_position] }}</div>
+                <div class="staff-item__name staff-item__name_orange">{{ App\User::POSITIONS_LANGUAGE[$user->pivot->hotel_position] }}</div>
                 <div class="staff-item__bottom">
                   <p class="staff-item__text">{{ $user->position }}</p>
                   <p class="staff-item__text">{{ $user->phone }}</p>
@@ -77,7 +77,7 @@
                  data-id="createUser"
                  data-position="{{ App\User::POSITION_STAFF }}"
                  data-position-language="{{ App\User::POSITIONS_LANGUAGE[App\User::POSITION_STAFF] }}">
-              <div class="staff-item__name staff-item__name_orange">Staff</div>
+              <div class="staff-item__name">Staff</div>
               <div class="staff-item__bottom">
                 <p class="staff-item__text">Должность</p>
                 <p class="staff-item__text">+7 ( _ _ _ ) _ _ _ _ _ _</p>

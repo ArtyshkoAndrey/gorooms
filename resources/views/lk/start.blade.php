@@ -5,19 +5,25 @@
   <div class="overlay open"></div>
 
   <div class="popup popup_horizontal open" id="newObject">
-    <form action="{{ route('lk.object.store') }}" method="post">
+    <form action="{{ route('lk.object.store') }}" autocomplete="off" method="post">
       @csrf
       <img src="{{ asset('img/lk/close.png') }}" alt="" id="close" class="close-this">
       <h2 class="title title_blue popup__title">Зарегистрировать новый объект</h2>
       <div class="d-flex align-items-center case">
 
         <input type="text"
+               readonly
+               autocomplete="nope"
+               onfocus="this.removeAttribute('readonly')"
                class="field form-control @error('name') is-invalid @enderror"
                value="{{ auth()->check() ? old('name', auth()->user()->name) : old('name') }}"
                placeholder="ФИО"
                name="name">
 
         <input type="phone"
+               readonly
+               autocomplete="nope"
+               onfocus="this.removeAttribute('readonly')"
                class="field form-control @error('phone') is-invalid @enderror"
                value="{{ auth()->check() ? old('phone', auth()->user()->phone) : old('phone') }}"
                placeholder="Личный телефон"
@@ -26,11 +32,17 @@
 
       <div class="d-flex align-items-center case">
         <input type="text"
+               readonly
+               autocomplete="nope"
+               onfocus="this.removeAttribute('readonly')"
                class="field form-control @error('position') is-invalid @enderror"
                value="{{ auth()->check() ? old('position', auth()->user()->position) : old('position') }}"
                placeholder="Должность"
                name="position">
         <input type="email"
+               readonly
+               autocomplete="nope"
+               onfocus="this.removeAttribute('readonly')"
                class="field form-control @error('email') is-invalid @enderror"
                value="{{ auth()->check() ? old('email', auth()->user()->email) : old('email') }}"
                placeholder="Личный e-mail"
@@ -39,6 +51,9 @@
 
       <div class="d-flex align-items-center case">
         <input type="text"
+               readonly
+               autocomplete="nope"
+               onfocus="this.removeAttribute('readonly')"
                class="field form-control @error('password') is-invalid @enderror"
                {{ !auth()->check() ? 'required' : '' }}
                placeholder="Придумайте пароль"
@@ -46,6 +61,9 @@
                name="password"
         >
         <input type="text"
+               readonly
+               autocomplete="nope"
+               onfocus="this.removeAttribute('readonly')"
                class="field form-control @error('code') is-invalid @enderror"
                placeholder="Придумайте кодовое слово"
                value="{{ auth()->check() ? old('code', auth()->user()->code) : old('code') }}"
@@ -54,6 +72,9 @@
 
       <div class="d-flex align-items-center case">
         <input type="text"
+               readonly
+               autocomplete="nope"
+               onfocus="this.removeAttribute('readonly')"
                class="field form-control @error('hotel.name') is-invalid @enderror"
                placeholder="Название объекта размещения"
                value="{{ old("hotel.name") }}"
@@ -81,6 +102,10 @@
       <div class="d-flex align-items-start case">
         <div style="width: 49%">
           <input type="text"
+                 readonly
+                 autocorrect="off" autocapitalize="off"
+                 autocomplete="nope"
+                 onfocus="this.removeAttribute('readonly')"
                  class="field w-100 form-control @error('address') is-invalid @enderror"
                  id="address"
                  name="address"
@@ -134,10 +159,21 @@
       token: "a35c9ab8625a02df0c3cab85b0bc2e9c0ea27ba4",
       type: "ADDRESS",
       count: 20,
+      onSelect : function (suggestion) {
+        console.log(suggestion)
+        if (suggestion.data.house === null)
+          $("#address").suggestions().update()
+      }
     });
 
     $(document).ready(function () {
       $('.overlay.open').unbind('click')
+
+      setInterval(() => {
+        $("#address").autocomplete({
+          disabled: true
+        });
+      }, 300)
     })
 
 

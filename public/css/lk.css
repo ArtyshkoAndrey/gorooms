@@ -1261,7 +1261,7 @@ input[type="radio"]:checked + label {
 	font-size: 14px;
 }
 
-.ck-editor_hidden .ck-editor {
+.ck-editor_hidden textarea {
 	display: none;
 
 }
@@ -1404,7 +1404,8 @@ main {
 }
 
 .suggestions-suggestions {
-	height: 100px;
+	height: 250px;
+	bottom: 52px;
 	overflow-x: auto;
 }
 
@@ -1432,4 +1433,27 @@ textarea.form-control {
 .select2-container--open .select2-dropdown--below {
 	margin-top: -49px!important;
 	border-radius: 5px;
+}
+
+.field[readonly] {
+	background-color: white!important;
+	opacity: 1;
+}
+.tiny-content {
+	color: #000000 !important;
+}
+.tiny-content img {
+	float: left!important;
+	margin: 10px 20px 10px 0px!important;
+}
+
+.tiny-content iframe {
+	width: 70% !important;
+	display: block;;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.tiny-content p {
+	font-size: 14px!important;
 }

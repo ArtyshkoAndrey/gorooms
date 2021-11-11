@@ -7,15 +7,15 @@
 
 namespace App\Observers;
 
-use Cache;
+use Route;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Room;
 use App\Models\Hotel;
 
 class RoomObserver
 {
 
-  //TODO: После первой созданной комнаты, падает на модерацию.
-  //TODO: После того как будут на модерации все комнаты, отель заново на модерацию
+  // TODO: Осталось сделать что бы вызывалась проверка для отеля при изменений категорий и фотографий
   /**
    * Handle the room "created" event.
    * Сбрасывает о том что недавно выбрали тип.
@@ -27,38 +27,23 @@ class RoomObserver
    */
   public function created(Room $room): void
   {
-    if (auth()->check()) {
-      Cache::flush();
-      $hotel = $room->hotel;
+    Cache::flush();
+    $hotel = Hotel::withoutGlobalScope('moderation')->findOrFail($room->hotel_id);
 
-      if (!auth()->user()->is_moderate && !auth()->user()->is_admin ) {
-
-        $roomsModeration = Room::where('moderate', true)
-          ->whereHas('hotel', function ($q) use($hotel) {
-            $q->where('id', $hotel->id);
-          })->count();
-
-        // Если все комнаты на модерацию упали, то отель на модерацию
-        if ($hotel->rooms()->count() === $roomsModeration ) {
-          $hotel->moderate = true;
-        }
-      }
-
-      // При создании одной комнаты запрет отельеру редактировать поля (Один раз после самой первой созданной комнаты)
-      if ($hotel->old_moderate === false) {
-        $hotel->old_moderate = true;
-
-        $hotel->moderate = true;
-      }
-
-      // При создании комнаты, можно будет заново выбирать тип отеля ко комнатам
-      if ($hotel->checked_type_fond === true) {
-        $hotel->checked_type_fond = false;
-      }
-      $hotel->save();
+    // При создании одной комнаты запрет отельеру редактировать поля (Один раз после самой первой созданной комнаты)
+    if ($hotel->old_moderate === false) {
+      $hotel->old_moderate = true;
     }
 
+    // При создании комнаты, можно будет заново выбирать тип отеля ко комнатам
+    if ($hotel->checked_type_fond === true) {
+      $hotel->checked_type_fond = false;
+    }
+    $hotel->save();
 
+//    if (Route::currentRouteNamed('lk.*')) {
+      $this->moderate_hotel($hotel);
+//    }
   }
 
   /**
@@ -69,13 +54,13 @@ class RoomObserver
    */
   public function updated(Room $room): void
   {
-    if (auth()->check()) {
-      Cache::flush();
-
-      $hotel = $room->hotel;
-
+    Cache::flush();
+    $hotel = Hotel::withoutGlobalScope('moderation')->findOrFail($room->hotel_id);
+//    if (Route::currentRouteNamed('lk.*')) {
+    if ($hotel) {
       $this->moderate_hotel($hotel);
     }
+//    }
   }
 
   /**
@@ -87,23 +72,18 @@ class RoomObserver
   public function deleted(Room $room): void
   {
     Cache::flush();
-    $hotel = $room->hotel;
+    $hotel = Hotel::withoutGlobalScope('moderation')->findOrFail($room->hotel_id);
     if ($hotel->rooms()->count() === 0) {
       $hotel->type_fond = null;
       $hotel->checked_type_fond = false;
-
-      if (!auth()->user()->is_moderate && !auth()->user()->is_admin) {
-        $hotel->moderate = true;
-      }
 
       $hotel->categories()->delete();
       $hotel->save();
     }
 
-    if (auth()->check()) {
-
+//    if (Route::currentRouteNamed('lk.*')) {
       $this->moderate_hotel($hotel);
-    }
+//    }
   }
 
   /**
@@ -129,21 +109,26 @@ class RoomObserver
   }
 
   /**
+   * Set show or hide hotel if zero rooms in publish
+   *
    * @param Hotel $hotel
    */
   private function moderate_hotel (Hotel $hotel): void
   {
-    if (!auth()->user()->is_moderate && !auth()->user()->is_admin) {
+    $roomsModeration = Room::withoutGlobalScope('moderation')
+      ->where('moderate', false)
+      ->whereHas('hotel', function ($q) use ($hotel) {
+        $q->where('id', $hotel->id);
+      })->count();
 
-      $roomsModeration = Room::where('moderate', true)->whereHas('hotel', function ($q) use ($hotel) {
-          $q->where('id', $hotel->id);
-        })->count();
-
-      // Если все комнаты на модерацию упали, то отель на модерацию
-      if ($hotel->rooms()->count() === $roomsModeration) {
-        $hotel->moderate = true;
-      }
+    // Если все комнаты на модерацию упали, то отель на модерацию
+    if ($roomsModeration > 0) {
+      $hotel->show = true;
+    } else {
+      $hotel->show = false;
     }
+
+    \Log::debug('Show hotel is ' . ($hotel->show ? 'true' : 'false'));
 
     $hotel->save();
   }

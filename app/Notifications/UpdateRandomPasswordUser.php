@@ -34,7 +34,7 @@ class UpdateRandomPasswordUser extends Notification
    *
    * @return void
    */
-  public function __construct (User $user, string $password)
+  public function __construct(User $user, string $password)
   {
     $this->user = $user;
     $this->password = $password;
@@ -47,7 +47,7 @@ class UpdateRandomPasswordUser extends Notification
    *
    * @return array
    */
-  public function via ($notifiable): array
+  public function via($notifiable): array
   {
     return ['mail'];
   }
@@ -59,9 +59,15 @@ class UpdateRandomPasswordUser extends Notification
    *
    * @return MailMessage
    */
-  public function toMail ($notifiable): MailMessage
+  public function toMail($notifiable): MailMessage
   {
-    return (new MailMessage)->greeting('Привет!')->subject('Сброс пароля на сайте Gorooms')->line('Для вас был сгенерирован новый пароль')->line('Логин: ' . $this->user->email)->line('Пароль: ' . $this->password)->line('В личном кабинете сотрудников отеля Вы можете его изменить');
+    return (new MailMessage)
+      ->greeting('Здраствуйте ' . $this->user->name . '!')
+      ->subject('Изменён пароль пользователя')
+      ->line('Для вас был сгенерирован новый пароль')
+      ->line('Логин: ' . $this->user->email)
+      ->line('Пароль: ' . $this->password)
+      ->line('В личном кабинете сотрудников отеля Вы можете его изменить');
   }
 
   /**
@@ -71,7 +77,7 @@ class UpdateRandomPasswordUser extends Notification
    *
    * @return array
    */
-  public function toArray ($notifiable): array
+  public function toArray($notifiable): array
   {
     return [//
     ];

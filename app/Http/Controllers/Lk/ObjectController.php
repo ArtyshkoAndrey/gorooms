@@ -33,7 +33,6 @@ class ObjectController extends Controller
    */
   public function store(Request $request): RedirectResponse
   {
-//    TODO: Убрать вставку почты и телефона в отель от юзера
     $request->validate([
       'name' => 'required|string|min:0',
       'password' => 'string|min:3',
@@ -61,7 +60,6 @@ class ObjectController extends Controller
 
       $user = new User($request->all());
       $user->password = Hash::make($request->password);
-//      TODO: Тавить в отеле генерал юзера
       $user->save();
       Auth::loginUsingId($user->id, true);
     }

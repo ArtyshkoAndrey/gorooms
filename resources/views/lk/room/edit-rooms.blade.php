@@ -139,9 +139,10 @@
               <div class="col-2">
 
                 <label class="room-text" for="orderRoom-{{ $room->id }}">Ордер</label>
-                <input type="text"
+                <input type="number"
+                       min="1"
                        name="order"
-                       class="field field_border"
+                       class="field field_border has-validate-error"
                        id="orderRoom-{{ $room->id }}"
                        placeholder="#1"
                        value="{{ $room->order }}">
@@ -151,9 +152,10 @@
               <div class="col-2">
 
                 <label class="room-text" for="numberRoom-{{ $room->id }}m">Номер</label>
-                <input type="text"
+                <input type="number"
+                       min="1"
                        name="number"
-                       class="field field_border"
+                       class="field field_border has-validate-error"
                        id="numberRoom-{{ $room->id }}"
                        placeholder="№1"
                        value="{{ $room->number }}">
@@ -165,7 +167,7 @@
                 <label class="room-text" for="nameRoom-{{ $room->id }}">Название</label>
                 <input type="text"
                        name="name"
-                       class="field field_border"
+                       class="field field_border has-validate-error"
                        id="nameRoom-{{ $room->id }}"
                        placeholder="Название"
                        value="{{ $room->name }}">
@@ -176,7 +178,7 @@
                 <p class="room-text">
                   Категория
                 </p>
-                <div class="select" id="selectRoom">
+                <div class="select has-validate-error-select" id="selectRoom">
                   <input type="hidden" name="category_id" value="{{ $room->category->id ?? '' }}">
                   <div class="select__top select__top_100">
                     <span class="select__current">{{ $room->category->name ?? 'Категория' }}</span>
@@ -239,23 +241,23 @@
                     <div class="d-flex align-items-center">
                       <input type="number"
                              min="0"
-                             class="field hours__field"
+                             class="field hours__field has-validate-error"
                              id="value-{{ $room->id }}-{{$type->id}}"
-                             placeholder="{{ $costRoom->value ?? '0000' }}"
-                             value="{{ $costRoom->value ?? '' }}">
+                             placeholder=""
+                             value="{{ $costRoom->value ?? null }}">
 
                       <div class="hours__hidden">
-                        <span class="hours__money">{{ $costRoom->value ?? '0000' }}</span>
+                        <span class="hours__money"></span>
                         <span class="hours__rub">руб.</span>
                       </div>
 
                       <span class="rub">руб.</span>
 
-                      <div class="select hours__select">
+                      <div class="select has-validate-error-select hours__select">
                         <input type="hidden"
                                name="type[]"
                                data-id="{{$type->id}}"
-                               value="{{ $costRoom->period->id ?? '' }}">
+                               value="{{ $costRoom->period->id ?? null }}">
 
                         <div class="select__top">
                           <span class="select__current">{{ $costRoom->period->info ?? 'Период' }}</span>
@@ -269,8 +271,8 @@
                         </ul>
                       </div>
                       <span class="hours__after">
-                      От 2-х часов
-                    </span>
+                        {{ $costRoom->period->info ?? 'Период' }}
+                      </span>
                     </div>
                   </li>
                 @endforeach
@@ -278,7 +280,7 @@
             </div>
             <div class="row more-details">
               <div class="col-12">
-                <p class="text">Детально о номере</p>
+                <p class="text {{ $room->attrs()->count() === 0 ? 'is-invalid form-control' : '' }}">Детально о номере</p>
                 <p class="caption caption_mt">
                   Выберите пункты наиболее точно отражающие преимущества данного номера
                   / группы номеров. (минимум 3, максимум 9 пунктов)
@@ -288,6 +290,13 @@
             </div>
 
             <div class="row">
+              <div class="col-12">
+                <div class="mt-2 attributes-list">
+                  @foreach($room->attrs as $a)
+                    <span>{{ $a->name . (!$loop->last ? ',' : '') }}</span>
+                  @endforeach
+                </div>
+              </div>
               <div class="col-12">
                 <a class="show-all show-all_orange" data-room-id="{{ $room->id }}">Показать все</a>
               </div>
@@ -359,18 +368,20 @@
     <div class="row room-details">
       <div class="col-2">
         <label class="room-text" for="orderRoom">Ордер</label>
-        <input type="text"
+        <input type="number"
                name="order"
-               class="field field_border"
+               min="1"
+               class="field field_border has-validate-error"
                id="orderRoom"
                placeholder="#1"
                autofocus>
       </div>
       <div class="col-2">
         <label class="room-text" for="numberRoom">Номер</label>
-        <input type="text"
+        <input type="number"
                name="number"
-               class="field field_border"
+               min="1"
+               class="field field_border has-validate-error"
                id="numberRoom"
                placeholder="№1">
       </div>
@@ -378,16 +389,16 @@
         <label class="room-text" for="nameRoom">Название</label>
         <input type="text"
                name="name"
-               class="field field_border"
+               class="field field_border has-validate-error"
                id="nameRoom"
-               placeholder="Блейз">
+               placeholder="Название">
       </div>
       <div class="col-4">
         <p class="room-text">
           Категория
         </p>
-        <div class="select" id="selectRoom">
-          <input type="hidden"  name="category_id">
+        <div class="select has-validate-error-select" id="selectRoom">
+          <input type="hidden" name="category_id">
           <div class="select__top select__top_100">
             <span class="select__current">Категория</span>
             <img class="select__arrow" src="{{ asset('img/lk/arrow.png') }}" alt="">
@@ -446,22 +457,24 @@
             <div class="d-flex align-items-center">
               <input type="number"
                      min="0"
-                     class="field hours__field"
+                     value=""
+                     class="field hours__field has-validate-error"
                      id="value"
-                     placeholder="0000">
+                     placeholder="">
 
               <div class="hours__hidden">
-                <span class="hours__money">0000</span>
+                <span class="hours__money"></span>
                 <span class="hours__rub">руб.</span>
               </div>
 
               <span class="rub">руб.</span>
 
-              <div class="select hours__select">
+              <div class="select has-validate-error-select hours__select">
                 <input type="hidden"
                        name="type[]"
                        data-id="{{$type->id}}"
-                       value="">
+                       value=""
+                >
 
                 <div class="select__top">
                   <span class="select__current">Период</span>
@@ -475,8 +488,8 @@
                 </ul>
               </div>
               <span class="hours__after">
-                      От 2-х часов
-                    </span>
+                Период
+              </span>
             </div>
           </li>
         @endforeach
@@ -484,7 +497,7 @@
     </div>
     <div class="row more-details">
       <div class="col-12">
-        <p class="text">Детально о номере</p>
+        <p class="text is-invalid form-control">Детально о номере</p>
         <p class="caption caption_mt">
           Выберите пункты наиболее точно отражающие преимущества данного номера / группы номеров. (минимум 3, максимум 9 пунктов)
         </p>
@@ -493,6 +506,11 @@
     </div>
 
     <div class="row">
+      <div class="col-12">
+        <div class="mt-2 attributes-list">
+
+        </div>
+      </div>
       <div class="col-12">
         <a class="show-all show-all_orange">Показать все</a>
       </div>
@@ -535,9 +553,27 @@
     $(document).ready(function () {
       $('.sortable').sortable({
         items: '.dz-image-preview',
+        update: function (event, ui) {
+          let ids = [];
+          $(".sortable li").each(function(i) {
+            ids.push($(this).attr('data-id'))
+          });
+          console.log(ids)
+
+          axios.post('/api/images/ordered', {
+            ids
+          })
+            .catch(e => {
+              if (e.response.data.message) {
+                alert(e.response.data.message)
+              }
+            })
+        }
       });
 
-      $('.quote__read').each(saveFrontData)
+      $('.quote__read').each(function () {
+        saveFrontData.call(this, true)
+      })
 
       blockDropZone.each(function() {
         let zone = this
@@ -555,18 +591,18 @@
         @foreach($room->images as $image)
 
           existFile[{{ $room->id }}].push({
-          id: "{{ $image->id }}",
-          name: "{{ $image->name }}",
-          path: "{{ url($image->path) }}",
-          moderate_text: "{{ $image->moderate ? 'Проверка модератором' : 'Опубликовано' }}",
-          moderate: {!! $image->moderate ? 'true' : 'false' !!}
-        })
+            id: "{{ $image->id }}",
+            name: "{{ $image->name }}",
+            path: "{{ url($image->path) }}",
+            moderate_text: "{{ $image->moderate ? 'Проверка модератором' : 'Опубликовано' }}",
+            moderate: {!! $image->moderate ? 'true' : 'false' !!}
+          })
 
-        mockFile = { name: '{{ $image->name }}', dataURL: '{{ url($image->path) }}', size: {{ File::exists($image->getRawOriginal('path')) ? File::size($image->getRawOriginal('path')) : 0 }} };
-        uploader[{{ $room->id }}].emit("addedfile", mockFile);
-        uploader[{{ $room->id }}].emit("thumbnail", mockFile, '{{ url($image->path) }}');
-        uploader[{{ $room->id }}].emit("complete", mockFile);
-        uploader[{{ $room->id }}].files.push(mockFile)
+          mockFile = { name: '{{ $image->name }}', dataURL: '{{ url($image->path) }}', size: {{ File::exists($image->getRawOriginal('path')) ? File::size($image->getRawOriginal('path')) : 0 }} };
+          uploader[{{ $room->id }}].emit("addedfile", mockFile);
+          uploader[{{ $room->id }}].emit("thumbnail", mockFile, '{{ url($image->path) }}');
+          uploader[{{ $room->id }}].emit("complete", mockFile);
+          uploader[{{ $room->id }}].files.push(mockFile)
 
         @endforeach
       @endforeach
@@ -583,7 +619,6 @@
         thumbnailWidth: 352,
         thumbnailHeight: 260,
         addRemoveLinks: true,
-        uploadMultiple: false,
         previewsContainer: '.visualizacao-' + zone.dataset.id,
         previewTemplate: $(zone).siblings('.preview').html(),
         acceptedFiles: "image/*",
@@ -602,6 +637,9 @@
 
             let d = file.previewElement.querySelector("[data-dz-success]");
             d.innerHTML = f.moderate_text
+
+            file.previewElement.dataset.id = f.id
+
             if (!f.moderate) {
               d.style.color="#2f64ad"
             }
@@ -609,6 +647,10 @@
             $(".dz-remove").html("<span class='upload__remove'><i class='fa fa-trash' aria-hidden='true'></i></span>");
             let str = $('ul.visualizacao-' + zone.dataset.id).get(0)
             $(zone).appendTo(str)
+
+            if (existFile[zone.dataset.id].length >= 6) {
+              $(zone).hide()
+            }
           });
           this.on('success', function (file, json) {
             console.log(json)
@@ -623,18 +665,18 @@
             })
           });
           this.on("addedfile", function(file) {
-            while (this.files.length  > this.options.maxFiles) {
-              this.removeFile(this.files[0]);
-              existFile[zone.dataset.id].shift();
+            if (this.files[6] != null){
+              this.removeFile(this.files[6], existFile[zone.dataset.id]);
+              existFile[zone.dataset.id].pop();
               console.log(file, this.files.length, this.options.maxFiles)
             }
           });
           this.on("reset", function (file) {
             $(zone).show()
           });
-          this.on('queuecomplete', function (file) {
-            $(this).parents(".shadow").find('.uploud__min').hide()
-          });
+          // this.on('queuecomplete', function (file) {
+          //   $(this).parents(".shadow").find('.uploud__min').hide()
+          // });
           this.on("removedfile", function (file) {
             console.log(file)
             if (existFile[zone.dataset.id].length === 1) {
@@ -666,7 +708,6 @@
                   .catch(error => {
                     alert('Ошибка при удалении')
                   })
-                return;
               }
             })
             if (!flag) {
@@ -685,12 +726,27 @@
                     .catch(error => {
                       alert('Ошибка при удалении')
                     })
-                  return;
                 }
               })
             }
+
+            setTimeout(() => {
+              if (this.files.length < 6) {
+                $(zone).show()
+              }
+            }, 600)
           })
         }
+      }
+    }
+
+    function removeFile (file, existFile) {
+      if (this.files.length > this.options.maxFiles) {
+        this.removeFile(this.files[0]);
+        existFile.shift();
+        console.log(file, this.files.length, this.options.maxFiles)
+      } else {
+        removeFile.call(this, file)
       }
     }
 

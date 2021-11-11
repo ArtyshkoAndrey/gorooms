@@ -168,7 +168,7 @@
 
             <div class="row">
               <div class="col-12 mt-3">
-                <ul class="uploud all-slides">
+                <ul class="uploud visualizacao all-slides">
                   @foreach($room->images as $image)
                     <li class="uploud__item"
                         data-image-id="{{ $image->id }}"
@@ -220,23 +220,23 @@
                     <div class="d-flex align-items-center">
                       <input type="number"
                              min="0"
-                             class="field hours__field"
+                             class="field hours__field has-validate-error"
                              id="value-{{ $room->id }}-{{$type->id}}"
-                             placeholder="{{ $costRoom->value ?? '0000' }}"
-                             value="{{ $costRoom->value ?? '' }}">
+                             placeholder="{{ $costRoom->value ?? '' }}"
+                             value="{{ $costRoom->value ?? null }}">
 
                       <div class="hours__hidden">
-                        <span class="hours__money">{{ $costRoom->value ?? '0000' }}</span>
+                        <span class="hours__money">{{ $costRoom->value ?? null }}</span>
                         <span class="hours__rub">руб.</span>
                       </div>
 
                       <span class="rub">руб.</span>
 
-                      <div class="select hours__select">
+                      <div class="select hours__select has-validate-error-select">
                         <input type="hidden"
                                name="type[]"
                                data-id="{{$type->id}}"
-                               value="{{ $costRoom->period->id ?? '' }}">
+                               value="{{ $costRoom->period->id ?? null }}">
 
                         <div class="select__top">
                           <span class="select__current">{{ $costRoom->period->info ?? 'Период' }}</span>
@@ -250,8 +250,8 @@
                         </ul>
                       </div>
                       <span class="hours__after">
-                      От 2-х часов
-                    </span>
+                        {{ $costRoom->period->info ?? 'Период' }}
+                      </span>
                     </div>
                   </li>
                 @endforeach
@@ -259,7 +259,7 @@
             </div>
             <div class="row more-details">
               <div class="col-12">
-                <p class="text">Детально о номере</p>
+                <p class="text {{ $room->attrs()->count() === 0 ? 'is-invalid form-control' : '' }}">Детально о номере</p>
                 <p class="caption caption_mt">
                   Выберите пункты наиболее точно отражающие преимущества данного номера
                   / группы номеров. (минимум 3, максимум 9 пунктов)
@@ -269,6 +269,13 @@
             </div>
 
             <div class="row">
+              <div class="col-12">
+                <div class="mt-2 attributes-list">
+                  @foreach($room->attrs as $a)
+                    <span>{{ $a->name . (!$loop->last ? ',' : '') }}</span>
+                  @endforeach
+                </div>
+              </div>
               <div class="col-12">
                 <a class="show-all show-all_orange" data-room-id="{{ $room->id }}">Показать все</a>
               </div>
@@ -301,15 +308,16 @@
 @endsection
 
 @section('header-js')
-  <script src="{{ asset('js/lk/room-categories.js') }}" async></script>
+  <script src="{{ asset('js/lk/room-categories.js') }}"></script>
 @endsection
 
 @section('js')
 
   <script defer="defer">
     $(document).ready(function () {
-      $('.sortable').sortable({
-        items: '.dz-image-preview',
+      $('.uploud').sortable({
+        items: '.uploud__item',
+        update: updateOrderPhotos
       });
 
       $('.quote__read').each(function () {

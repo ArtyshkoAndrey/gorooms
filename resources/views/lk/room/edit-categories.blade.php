@@ -99,7 +99,7 @@
             <div class="row row__head {{ !$room->moderate ? 'row__head_blue' : '' }}">
               <div class="col-6">
                 {{--    Название категории    --}}
-                <p class="head-text head-text_bold"> {{ $room->category->name }}</p>
+                <p class="head-text head-text_bold"> {{ $room->category->name ?? '' }}</p>
               </div>
 
               <div class="col-3">
@@ -116,12 +116,12 @@
                   <i class="fa fa-arrow-down p-3"></i>
                 </button>
               </div>
-{{--              <div class="col-1 text-right">--}}
-{{--                --}}{{--        Удалить комнату --}}
-{{--                <button class="quote__remove">--}}
-{{--                  <i class="fa fa-trash"></i>--}}
-{{--                </button>--}}
-{{--              </div>--}}
+              {{--              <div class="col-1 text-right">--}}
+              {{--                --}}{{--        Удалить комнату --}}
+              {{--                <button class="quote__remove">--}}
+              {{--                  <i class="fa fa-trash"></i>--}}
+              {{--                </button>--}}
+              {{--              </div>--}}
             </div>
 
             {{--          Status--}}
@@ -146,7 +146,7 @@
                   <div class="select category-select">
                     <input type="hidden" name="category_id" value="{{ $room->category->id }}">
                     <div class="select__top">
-                      <span class="select__current">{{ $room->category->name }}</span>
+                      <span class="select__current">{{ $room->category->name ?? '' }}</span>
                     </div>
                   </div>
                   <div class="quote-text d-flex align-items-center">
@@ -203,23 +203,23 @@
                     <div class="d-flex align-items-center">
                       <input type="number"
                              min="0"
-                             class="field hours__field"
+                             class="field hours__field has-validate-error"
                              id="value-{{ $room->id }}-{{$type->id}}"
-                             placeholder="{{ $costRoom->value ?? '0000' }}"
-                             value="{{ $costRoom->value ?? '' }}">
+                             placeholder=""
+                             value="{{ $costRoom->value ?? null }}">
 
                       <div class="hours__hidden">
-                        <span class="hours__money">{{ $costRoom->value ?? '0000' }}</span>
+                        <span class="hours__money">{{ $costRoom->value ?? '' }}</span>
                         <span class="hours__rub">руб.</span>
                       </div>
 
                       <span class="rub">руб.</span>
 
-                      <div class="select hours__select">
+                      <div class="select hours__select has-validate-error-select">
                         <input type="hidden"
                                name="type[]"
                                data-id="{{$type->id}}"
-                               value="{{ $costRoom->period->id ?? '' }}">
+                               value="{{ $costRoom->period->id ?? null }}">
 
                         <div class="select__top">
                           <span class="select__current">{{ $costRoom->period->info ?? 'Период' }}</span>
@@ -233,8 +233,8 @@
                         </ul>
                       </div>
                       <span class="hours__after">
-                      От 2-х часов
-                    </span>
+                        {{ $costRoom->period->info ?? 'Период' }}
+                      </span>
                     </div>
                   </li>
                 @endforeach
@@ -242,7 +242,7 @@
             </div>
             <div class="row more-details">
               <div class="col-12">
-                <p class="text">Детально о номере</p>
+                <p class="text {{ $room->attrs()->count() === 0 ? 'is-invalid form-control' : '' }}">Детально о номере</p>
                 <p class="caption caption_mt">
                   Выберите пункты наиболее точно отражающие преимущества данного номера
                   / группы номеров. (минимум 3, максимум 9 пунктов)
@@ -252,6 +252,13 @@
             </div>
 
             <div class="row">
+              <div class="col-12">
+                <div class="mt-2 attributes-list">
+                  @foreach($room->attrs as $a)
+                    <span>{{ $a->name . (!$loop->last ? ',' : '') }}</span>
+                  @endforeach
+                </div>
+              </div>
               <div class="col-12">
                 <a class="show-all show-all_orange" data-room-id="{{ $room->id }}">Показать все</a>
               </div>
@@ -263,9 +270,6 @@
                   <button class="quote__read quote__read_1">
                     <img src="{{ asset('img/lk/pen.png') }}" alt="">
                   </button>
-{{--                  <button class="quote__remove remove-btn">--}}
-{{--                    <i class="fa fa-trash"></i>--}}
-{{--                  </button>--}}
 
                 </div>
               </div>
@@ -296,12 +300,12 @@
 
     <div class="row row__head">
       <div class="col-6">
-{{--    Название категории    --}}
+        {{--    Название категории    --}}
         <p class="head-text head-text_bold"></p>
       </div>
 
       <div class="col-3">
-{{--        Сколько мест --}}
+        {{--        Сколько мест --}}
         <p class="head-text">Квота <span></span></p>
       </div>
       <div class="col-1">
@@ -314,14 +318,9 @@
           <i class="fa fa-arrow-down p-3"></i>
         </button>
       </div>
-{{--      <div class="col-1 text-right">--}}
-{{--        Удалить комнату --}}
-{{--        <button class="quote__remove">--}}
-{{--          <i class="fa fa-trash"></i>--}}
-{{--        </button>--}}
-{{--      </div>--}}
+
     </div>
-{{-- Статус --}}
+    {{-- Статус --}}
     <div class="row row-status">
       <div class="col-12">
         <p class="text quote__status quote__status_red">Проверка модератором</p>
@@ -332,7 +331,7 @@
       <div class="col-12">
         <div class="d-flex align-items-center">
           <div class="select category-select">
-            <input type="hidden"  name="category_id">
+            <input type="hidden" typeof="number" name="category_id">
             <div class="select__top">
               <span class="select__current"></span>
             </div>
@@ -356,7 +355,7 @@
           <li>
             <div>
               <div class="dz-preview dz-file-preview">
-                <img data-dz-thumbnail />
+                <img data-dz-thumbnail/>
                 <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
                 <div data-dz-success class="dz-success-mark"><span>Проверка модератором</span></div>
                 <div class="dz-error-mark"><span>✘</span></div>
@@ -379,7 +378,7 @@
       <ul class="hours">
         @foreach($costTypes as $type)
           @php
-            $id = $type->id;
+            $id = $type->id
           @endphp
           <li class="hour" data-id="{{ $type->id }}">
             <p class="heading hours__heading">
@@ -388,18 +387,19 @@
             <div class="d-flex align-items-center">
               <input type="number"
                      min="0"
-                     class="field hours__field"
+                     value=""
+                     class="field hours__field has-validate-error"
                      id="value"
-                     placeholder="0000">
+                     placeholder="">
 
               <div class="hours__hidden">
-                <span class="hours__money">0000</span>
+                <span class="hours__money"></span>
                 <span class="hours__rub">руб.</span>
               </div>
 
               <span class="rub">руб.</span>
 
-              <div class="select hours__select">
+              <div class="select hours__select has-validate-error-select">
                 <input type="hidden"
                        name="type[]"
                        data-id="{{$type->id}}"
@@ -417,8 +417,8 @@
                 </ul>
               </div>
               <span class="hours__after">
-                      От 2-х часов
-                    </span>
+                Период
+              </span>
             </div>
           </li>
         @endforeach
@@ -426,15 +426,20 @@
     </div>
     <div class="row more-details">
       <div class="col-12">
-        <p class="text">Детально о номере</p>
+        <p class="text is-invalid form-control">Детально о номере</p>
         <p class="caption caption_mt">
-          Выберите пункты наиболее точно отражающие преимущества данного номера / группы номеров. (минимум 3, максимум 9 пунктов)
+          Выберите пункты наиболее точно отражающие преимущества данного номера / группы номеров. (минимум 3, максимум 9
+          пунктов)
         </p>
       </div>
 
     </div>
 
     <div class="row">
+      <div class="col-12">
+        <div class="mt-2 attributes-list">
+        </div>
+      </div>
       <div class="col-12">
         <a class="show-all show-all_orange">Показать все</a>
       </div>
@@ -446,9 +451,6 @@
           <button class="quote__read quote__read_1">
             <img src="{{ asset('img/lk/pen.png') }}" alt="">
           </button>
-{{--          <button class="quote__remove remove-btn">--}}
-{{--            <i class="fa fa-trash"></i>--}}
-{{--          </button>--}}
 
         </div>
       </div>
@@ -462,18 +464,18 @@
 @endsection
 
 @section('header-js')
-  <script src="{{ asset('js/lk/room-categories.js') }}" async></script>
+  <script src="{{ asset('js/lk/room-categories.js') }}"></script>
 @endsection
 
 @section('js')
 
   <script defer="defer">
-    let blockDropZone =  $('.file-dropzone')
+    let blockDropZone = $('.file-dropzone')
     let uploader = []
     let mockFile
     let existFile = []
 
-    function initialDropZone () {
+    function initialDropZone() {
       let zone = this
       return {
         url: "{{ route('lk.room.image.upload') }}",
@@ -482,14 +484,13 @@
         thumbnailWidth: 352,
         thumbnailHeight: 260,
         addRemoveLinks: true,
-        uploadMultiple: false,
         previewsContainer: '.visualizacao-' + zone.dataset.id,
         previewTemplate: $(zone).siblings('.preview').html(),
         acceptedFiles: "image/*",
         headers: {
           'x-csrf-token': "{{ csrf_token() }}",
         },
-        sending: function(file, xhr, formData) {
+        sending: function (file, xhr, formData) {
           formData.append('model_name', "Room")
           formData.append('modelID', zone.dataset.id)
         },
@@ -501,13 +502,18 @@
 
             let d = file.previewElement.querySelector("[data-dz-success]");
             d.innerHTML = f.moderate_text
+
             if (!f.moderate) {
-              d.style.color="#2f64ad"
+              d.style.color = "#2f64ad"
             }
 
             $(".dz-remove").html("<span class='upload__remove'><i class='fa fa-trash' aria-hidden='true'></i></span>");
             let str = $('ul.visualizacao-' + zone.dataset.id).get(0)
             $(zone).appendTo(str)
+
+            if (existFile[zone.dataset.id].length >= 6) {
+              $(zone).hide()
+            }
           });
           this.on('success', function (file, json) {
             console.log(json)
@@ -521,28 +527,28 @@
               moderate: image.moderate
             })
           });
-          this.on("addedfile", function(file) {
-            while (this.files.length  > this.options.maxFiles) {
-              this.removeFile(this.files[0]);
-              existFile[zone.dataset.id].shift();
+          this.on("addedfile", function (file) {
+            if (this.files[6] != null){
+              this.removeFile(this.files[6], existFile[zone.dataset.id]);
+              existFile[zone.dataset.id].pop();
               console.log(file, this.files.length, this.options.maxFiles)
             }
           });
           this.on("reset", function (file) {
             $(zone).show()
           });
-          this.on('queuecomplete', function (file) {
-            $(this).parents(".shadow").find('.uploud__min').hide()
-          });
+          // this.on('queuecomplete', function (file) {
+          //   $(this).parents(".shadow").find('.uploud__min').hide()
+          // });
           this.on("removedfile", function (file) {
             console.log(file)
             if (existFile[zone.dataset.id].length === 1) {
               if (file.xhr) {
                 let image = JSON.parse(file.xhr.response).payload.images[0]
-                console.log("{{ url('/') }}" + "/"+ image.path)
-                mockFile = { name: file.name, dataURL: "{{ url('/') }}" + "/"+ image.path, size: 0 };
+                console.log("{{ url('/') }}" + "/" + image.path)
+                mockFile = {name: file.name, dataURL: "{{ url('/') }}" + "/" + image.path, size: 0};
               } else {
-                mockFile = { name: file.name, dataURL: file.dataURL, size: 0 };
+                mockFile = {name: file.name, dataURL: file.dataURL, size: 0};
               }
 
               uploader[zone.dataset.id].displayExistingFile(file, mockFile.dataURL)
@@ -551,7 +557,7 @@
 
             let flag = false
             existFile[zone.dataset.id].forEach(f => {
-              if(f.path === file.dataURL) {
+              if (f.path === file.dataURL) {
                 flag = true
                 let url = "{{ url('lk/room/image/delete/') }}" + '/' + f.id
                 axios.post(url)
@@ -565,12 +571,11 @@
                   .catch(error => {
                     alert('Ошибка при удалении')
                   })
-                return;
               }
             })
             if (!flag) {
               existFile[zone.dataset.id].forEach(f => {
-                if(f.id === JSON.parse(file.xhr.response).payload.images[0].id) {
+                if (f.id === JSON.parse(file.xhr.response).payload.images[0].id) {
                   flag = true
                   let url = "{{ url('lk/room/image/delete/') }}" + '/' + f.id
                   axios.post(url)
@@ -584,10 +589,15 @@
                     .catch(error => {
                       alert('Ошибка при удалении')
                     })
-                  return;
                 }
               })
             }
+
+            setTimeout(() => {
+              if (this.files.length < 6) {
+                $(zone).show()
+              }
+            }, 600)
           })
         }
       }
@@ -599,17 +609,16 @@
       });
 
 
-
       Dropzone.autoDiscover = false;
 
-      blockDropZone.each(function() {
+      blockDropZone.each(function () {
         let zone = this
         // instantiate the uploader
         if ($(zone).hasClass('dropzone_disabled')) {
 
         } else {
           // Dropzone initial
-          uploader[zone.dataset.id] = new Dropzone(this, initialDropZone.call(this) );
+          uploader[zone.dataset.id] = new Dropzone(this, initialDropZone.call(this));
         }
       })
 
@@ -625,7 +634,11 @@
         moderate: {!! $image->moderate ? 'true' : 'false' !!}
       })
 
-      mockFile = { name: '{{ $image->name }}', dataURL: '{{ url($image->path) }}' , size: {{ File::exists($image->getRawOriginal('path')) ? File::size($image->getRawOriginal('path')) : 0 }} };
+      mockFile = {
+        name: '{{ $image->name }}',
+        dataURL: '{{ url($image->path) }}',
+        size: {{ File::exists($image->getRawOriginal('path')) ? File::size($image->getRawOriginal('path')) : 0 }}
+      };
       uploader[{{ $room->id }}].emit("addedfile", mockFile);
       uploader[{{ $room->id }}].emit("thumbnail", mockFile, '{{ url($image->path) }}');
       uploader[{{ $room->id }}].emit("complete", mockFile);
@@ -637,6 +650,16 @@
       $('.quote__read').each(function () {
         saveFrontData.call(this, true)
       })
+
+      function removeFile (file, existFile) {
+        if (this.files.length > this.options.maxFiles) {
+          this.removeFile(this.files[0]);
+          existFile.shift();
+          console.log(file, this.files.length, this.options.maxFiles)
+        } else {
+          removeFile.call(this, file)
+        }
+      }
     });
 
   </script>

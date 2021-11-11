@@ -98,7 +98,6 @@
       @endif
       <div class="header-top-btns">
         @auth
-          {{--                TODO: Добавить ссылку на личный кабинет    --}}
           @if(!auth()->user()->hotel()->exists())
             @if (!auth()->user()->is_moderate)
               <a href="{{ route('lk.start') }}"
@@ -159,7 +158,6 @@
         </li>
 
         @auth
-          {{--                TODO: Добавить ссылку на личный кабинет    --}}
           @if(!auth()->user()->hotel()->exists() && !auth()->user()->is_moderate)
             @if (!auth()->user()->is_moderate)
               <li class="header-menu-item header-menu-item-mobile">
@@ -752,6 +750,23 @@
   }
   gtag('js', new Date());
   gtag('config', 'G-73NM6845XT');
+</script>
+<script>
+  $("input:checkbox.checkbox").on('click', function() {
+    // in the handler, 'this' refers to the box clicked on
+    var $box = $(this);
+    if ($box.is(":checked")) {
+      // the name of the box is retrieved using the .attr() method
+      // as it is assumed and expected to be immutable
+      var group = "input:checkbox[name='" + $box.attr("name") + "']";
+      // the checked state of the group/box on the other hand will change
+      // and the current value is retrieved using .prop() method
+      $(group).prop("checked", false);
+      $box.prop("checked", true);
+    } else {
+      $box.prop("checked", false);
+    }
+  });
 </script>
 </body>
 </html>

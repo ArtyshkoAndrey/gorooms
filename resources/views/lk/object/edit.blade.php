@@ -9,9 +9,12 @@
           <h2 class="title">Объект</h2>
         </div>
       </div>
-      <div class="row part__middle">
-        <div class="col-12">
+      <div class="row part__middle justify-content-between">
+        <div class="col-auto">
           <p class="heading">{{ $hotel->name }}</p>
+        </div>
+        <div class="col-auto">
+          <p class="{{ $hotel->moderate ? 'text-danger' : 'text-success' }}">{{ $hotel->moderate ? 'На проверке' : 'Проверен' }}</p>
         </div>
       </div>
       <div class="row">
@@ -110,6 +113,7 @@
               <p class="text-bold adress">Комментарий к адресу: </p>
               <input class="bordered form-control field @error('comment') is-invalid @enderror"
                      name="comment"
+                     {{ $hotel->disabled_save }}
                      value="{{ old('comment', $hotel->address->comment) }}"
                      placeholder="Введите текст">
 
@@ -125,7 +129,7 @@
 
         <div class="row part__bottom">
           <div class="col-12">
-            <button class="button" type="submit">Сохранить</button>
+            <button class="button" {{ $hotel->disabled_save }} type="submit">Сохранить</button>
 
           </div>
         </div>
@@ -157,6 +161,8 @@
             <textarea placeholder="Введите текст"
                       name="description"
                       id="editor"
+                      rows="8"
+                      {{ $hotel->disabled_save }}
                       class="field form-control @error('description') is-invalid @enderror">
               {!! old('description', $hotel->description) !!}
             </textarea>
@@ -169,7 +175,7 @@
         </div>
         <div class="row part__bottom">
           <div class="col-12">
-            <button class="button" type="submit">Сохранить</button>
+            <button class="button" {{ $hotel->disabled_save }} type="submit">Сохранить</button>
 
           </div>
         </div>
@@ -192,7 +198,9 @@
           <div class="col-10">
             <textarea placeholder="Введите текст"
                       name="route"
+                      {{ $hotel->disabled_save }}
                       id="editor2"
+                      rows="8"
                       class="field form-control @error('route') is-invalid @enderror">
               {!! old('route', $hotel->route) !!}
             </textarea>
@@ -205,7 +213,7 @@
         </div>
         <div class="row part__bottom">
           <div class="col-12">
-            <button class="button" type="submit">Сохранить</button>
+            <button class="button" {{ $hotel->disabled_save }} type="submit">Сохранить</button>
 
           </div>
         </div>
@@ -289,6 +297,7 @@
         <div class="row part__bottom">
           <div class="col-12">
             <button id="addMetroButton" onclick="addMetro()"
+                    {!! $hotel->metros()->count() >= 3 ? 'style="display: none"' : '' !!}
                     {{ $hotel->disabled_save }}
                     type="button" class="button"
             >
@@ -456,6 +465,8 @@
 @section('js')
   <script>
 
+    let existFile = []
+
     $(document).ready(function () {
       selectInit()
 
@@ -487,8 +498,10 @@
             let f = findExistImage(file, existFile)
             console.log(f)
 
-            let d = file.previewElement.querySelector("[data-dz-success]");
+            let d = file.previewElement.querySelector("[data-dz-success]")
             d.innerHTML = f.moderate_text
+
+            file.previewElement.dataset.id = f.id
 
             if (!f.moderate) {
               d.style.color = "#2f64ad"
@@ -496,12 +509,11 @@
 
             $(".dz-remove").html("<span class='upload__remove'><i class='fa fa-trash' aria-hidden='true'></i></span>");
             $('#file-dropzone').appendTo('.visualizacao')
-            console.log(existFile.length)
+
             if (existFile.length >= 6) {
               $('#file-dropzone').hide()
             }
           });
-
           this.on('success', function (file, json) {
             console.log(json)
             let image = json.payload.images[0]
@@ -514,11 +526,10 @@
               moderate: image.moderate
             })
           });
-
           this.on("addedfile", function (file) {
-            while (this.files.length > this.options.maxFiles) {
-              this.removeFile(this.files[0]);
-              existFile.shift();
+            if (this.files[6] != null){
+              this.removeFile(this.files[6]);
+              existFile.pop();
               console.log(file, this.files.length, this.options.maxFiles)
             }
           });
@@ -527,7 +538,7 @@
 
           });
           this.on("removedfile", function (file) {
-            console.log(file)
+            console.log(this)
             if (existFile.length === 1) {
               if (file.xhr) {
                 let image = JSON.parse(file.xhr.response).payload.images[0]
@@ -583,46 +594,41 @@
 
             setTimeout(() => {
               console.log(existFile.length)
-              if (existFile.length < 6) {
+              if (this.files.length < 6) {
                 $('#file-dropzone').show()
               }
-            }, 300)
+            }, 600)
           })
         }
       });
 
       let mockFile
-      let existFile = []
 
       @foreach($hotel->images as $image)
 
-      existFile.push({
-        id: "{{ $image->id }}",
-        name: "{{ $image->name }}",
-        path: "{{ url($image->path) }}",
-        moderate_text: "{{ $image->moderate ? 'Проверка модератором' : 'Опубликовано' }}",
-        moderate: {!! $image->moderate ? 'true' : 'false' !!}
-      })
+        existFile.push({
+          id: "{{ $image->id }}",
+          name: "{{ $image->name }}",
+          path: "{{ url($image->path) }}?w=578&h=340&q=85",
+          moderate_text: "{{ $image->moderate ? 'Проверка модератором' : 'Опубликовано' }}",
+          moderate: {!! $image->moderate ? 'true' : 'false' !!}
+        })
 
-      mockFile = {
-        name: '{{ $image->name }}',
-        dataURL: '{{ url($image->path) }}',
-        size: {{ File::exists($image->getRawOriginal('path')) ? File::size($image->getRawOriginal('path')) : 0 }}
-      };
-      uploader.emit("addedfile", mockFile);
-      uploader.emit("thumbnail", mockFile, '{{ url($image->path) }}');
-      uploader.emit("complete", mockFile);
-      uploader.files.push(mockFile)
+        mockFile = {
+          name: '{{ $image->name }}',
+          dataURL: '{{ url($image->path) }}?w=578&h=340&q=85',
+          size: {{ File::exists($image->getRawOriginal('path')) ? File::size($image->getRawOriginal('path')) : 0 }}
+        };
+        uploader.emit("addedfile", mockFile);
+        uploader.emit("thumbnail", mockFile, '{{ url($image->path) }}?w=578&h=340&q=85');
+        uploader.emit("complete", mockFile);
+        uploader.files.push(mockFile)
       @endforeach
     });
 
     let metros_ids = {{ $hotel->metros->pluck('distance')->max() ?? 1 }};
 
     let count_metros = {{ $hotel->metros()->count() > 0 ? $hotel->metros()->count() : 1 }};
-
-    if (count_metros === 3) {
-      $()
-    }
 
     function addMetro() {
       if (count_metros < 3) {
@@ -702,6 +708,16 @@
       console.log(e.params.data.color);
     }
 
+    function removeFile (file) {
+      if (this.files.length > this.options.maxFiles) {
+        this.removeFile(this.files[0]);
+        existFile.shift();
+        console.log(file, this.files.length, this.options.maxFiles)
+      } else {
+        removeFile.call(this, file)
+      }
+    }
+
     function deleteMetro(id) {
       count_metros--;
       let str = '[data-id=' + id + ']'
@@ -722,6 +738,22 @@
     $(document).ready(function () {
       $('.sortable').sortable({
         items: '.dz-image-preview',
+        update: function (event, ui) {
+          let ids = [];
+          $(".sortable li").each(function(i) {
+            ids.push($(this).attr('data-id'))
+          });
+          console.log(ids)
+
+          axios.post('/api/images/ordered', {
+            ids
+          })
+          .catch(e => {
+            if (e.response.data.message) {
+              alert(e.response.data.message)
+            }
+          })
+        }
       });
 
     });

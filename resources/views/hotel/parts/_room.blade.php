@@ -61,12 +61,19 @@ use App\Models\Room;
     @include('room.parts._rating')
     <div class="room-card-slider swiper-container js-hotel-card-slider">
       <div class="swiper-wrapper">
-        @foreach($room->images AS $image)
+        @if($room->moderate)
           <div class="swiper-slide">
-            <img class="swiper-lazy" data-src="{{ asset($image->path) }}?w=578&h=340&fit=crop&fm=webp&q=85"
-                 src="{{ asset('img/pr578x340.jpg') }}" alt="">
+            <img class="swiper-lazy" data-src="{{ asset('img/hotel-moderate.jpg') }}"
+                 src="{{ asset('img/hotel-moderate.jpg') }}" alt="moderate">
           </div>
-        @endforeach
+        @else
+          @foreach($room->images AS $image)
+            <div class="swiper-slide">
+              <img class="swiper-lazy" data-src="{{ asset($image->path) }}?w=578&h=340&fit=crop&fm=webp&q=85"
+                   src="{{ asset('img/pr578x340.jpg') }}" alt="">
+            </div>
+          @endforeach
+        @endif
       </div>
       <div class="swiper-button swiper-button-next"></div>
       <div class="swiper-button swiper-button-prev"></div>
@@ -74,8 +81,17 @@ use App\Models\Room;
     <div class="room-card-in">
       <div class="room-card-content">
         <a href="{{ route('hotels.show', $room->hotel) }}#room-{{ $room->id }}" class="room-card-header">
-          <p class="room-card-title">Номер: {{ $room->name }}</p>
-          <p class="room-card-type">{{ optional($room->category)->name }}</p>
+          @if ($room->number || $room->name)
+            @if ($room->number)
+              <p class="room-card-title">Номер: ({{ $room->number }}) {{ $room->name }}</p>
+            @else
+              <p class="room-card-title">Номер: {{ $room->name }}</p>
+            @endif
+            <p class="room-card-type">{{ optional($room->category)->name }}</p>
+          @else
+            <p class="room-card-title">Номер: {{ $room->category->name ?? '' }}</p>
+            <p class="room-card-type">Доступно: {{ $room->category->value ?? '' }} номеров</p>
+          @endif
         </a>
         <button class="room-card-more" type="button">Подробнее</button>
         <a href="{{ route('hotels.show', $room->hotel) }}" class="room-card-name">Отель “{{ $room->hotel->name }}”</a>
@@ -143,8 +159,13 @@ use App\Models\Room;
                 <div>
                   <p class="room-card-prices-item-title">{{ $cost->period->type->name }}</p>
                   <p class="room-card-prices-item-price">
-                    @if($cost->value !== '0'){{ $cost->value }} руб.@endif</p>
-                  @if(isset($cost->period->info))
+                    @if((int) $cost->value === 0)
+                       Не предоставляется
+                    @else
+                        {{ $cost->value }} руб.
+                    @endif
+                  </p>
+                  @if(isset($cost->period->info) && (int) $cost->value !== 0)
                     {{$cost->period->info}}
                   @endif
                 </div>

@@ -16,20 +16,20 @@ $(document).ready(function () {
             $('#js-menu-btn').removeClass('open');
             $('#js-menu').removeAttr('style');
             $('.rating-dropdown').removeAttr('style');
-            if ($('*').is('#review-form-wrapper')) {
+            if ($('#review-form-wrapper').length > 0) {
                 $('#review-form-wrapper').addClass('in').attr('aria-expanded', true);
             }
         } else {
-            if ($('*').is('#review-form-wrapper')) {
+            if ($('#review-form-wrapper').length > 0) {
                 $('#review-form-wrapper').removeClass('in').attr('aria-expanded', false);
             }
         }
         if (windowW >= 481) {
-            if ($('*').is('#details-list-wrapper')) {
+            if ($('#details-list-wrapper').length > 0) {
                 $('#details-list-wrapper').addClass('in').attr('aria-expanded', true);
             }
         } else {
-            if ($('*').is('#details-list-wrapper')) {
+            if ($('#details-list-wrapper').length > 0) {
                 $('#details-list-wrapper').removeClass('in').attr('aria-expanded', false);
             }
         }
@@ -56,7 +56,7 @@ $(document).ready(function () {
         $('.form-control-time').removeClass('js-time').attr('type', 'time');
     }
     //scroll search
-    if ($('*').is('#js-search')) {
+    if ($('#js-search').length > 0) {
         var search = $('#js-search');
         var searchWrapper = $('#js-search-wrapper');
         var searchTop = header.height() + 4;
@@ -186,12 +186,15 @@ $(document).ready(function () {
     }
     let flagCost = true;
     function selectPricesColumns(elem) {
+
         let qArr = queryData().query;
 
-        $(elem).removeClass('disabled');
-        elem.querySelectorAll('input').forEach(input => {
-            $(input).attr("disabled", false);
-        });
+        if (typeof elem !== 'boolean') {
+            $(elem).removeClass('disabled');
+            elem.querySelectorAll('input').forEach(input => {
+                $(input).attr("disabled", false);
+            });
+        }
         advancedSearchPrices.forEach(item => {
             if (item !== elem) {
                 $(item).addClass('disabled');
@@ -227,8 +230,13 @@ $(document).ready(function () {
 
         controls.forEach((control, index) => {
             $(control).click(function () {
-                index = (index === 3) ? 2 : index;
-                selectPricesColumns(advancedSearchPrices[index]);
+                if ($(control).find('input').is(":checked")) {
+                    index = (index === 3) ? 2 : index;
+                    selectPricesColumns(advancedSearchPrices[index]);
+                } else {
+                    selectPricesColumns(false);
+                }
+
             });
         });
         advancedSearchPricesInputs.forEach(function (item) {
@@ -249,10 +257,14 @@ $(document).ready(function () {
             return index
         }
 
-        const indexCol = check(advancedSearchPricesInputs) || 0;
+        const indexCol = check(advancedSearchPricesInputs) || false;
 
-        $(controls[indexCol].querySelector('input')).attr('checked', true);
-        selectPricesColumns(advancedSearchPrices[indexCol]);
+        if (indexCol === false) {
+            selectPricesColumns(false);
+        } else {
+            $(controls[indexCol].querySelector('input')).attr('checked', true);
+            selectPricesColumns(advancedSearchPrices[indexCol]);
+        }
 
     }
 
@@ -273,10 +285,10 @@ $(document).ready(function () {
         $('#js-menu').slideToggle();
     });
     //sliders
-    if ($('*').is('.js-hotel-card-slider')) {
+    if ($('.js-hotel-card-slider').length > 0) {
         js_hotel_card_slider_init();
     }
-    if ($('*').is('.product-slider-big')) {
+    if ($('.product-slider-big').length > 0) {
         var galleryThumbs = new Swiper('.product-slider-small', {
             spaceBetween: 10,
             slidesPerView: 2,
@@ -331,7 +343,7 @@ $(document).ready(function () {
             // }
         });
     }
-    if($('*').is('.product-slider-big-mobile')) {
+    if($('.product-slider-big-mobile').length > 0) {
         const galleryTopMobile = new Swiper('.product-slider-big-mobile', {
             loop: true,
             lazy: true,
@@ -343,7 +355,7 @@ $(document).ready(function () {
     }
 
     //changing name of more-btn
-    if ($('*').is('.content-more')) {
+    if ($('.content-more').length > 0) {
         $('.content-more ').on('show.bs.collapse', function () {
             $(this).next('.content-more-btn').children('span').text('Свернуть');
         });
@@ -356,7 +368,7 @@ $(document).ready(function () {
     $('.js-time').mask('99:99');
 
     //tables
-    if ($('*').is('.text-section table')) {
+    if ($('.text-section table').length > 0) {
         var tables = $('.text-section').find('table');
         tables.each(function () {
             $(this).wrapAll('<div class="table-wrapper">');
@@ -368,7 +380,7 @@ $(document).ready(function () {
         $(this).next('.js-tel-link').addClass('visible');
     });
     //formstyler
-    if ($('*').is('select')) {
+    if ($('select').length > 0) {
         $('select').styler();
     }
     //rating
@@ -516,7 +528,7 @@ function js_hotel_card_slider_init(){
 
 let loading = false;
 
-async function loadMore(e, url) {
+async function loadMore(e, url, callback = null) {
     if (loading) {
         return;
     }
@@ -532,6 +544,8 @@ async function loadMore(e, url) {
     window.hotelCardSwiper.destroy();
     js_hotel_card_slider_init();
     loading = false;
+    js_hotel_card_slider_init()
+
 }
 
 function updateCounter(html) {

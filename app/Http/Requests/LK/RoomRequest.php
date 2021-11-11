@@ -39,7 +39,7 @@ class RoomRequest extends FormRequest
 
     if ($hotel->type_fond === Hotel::CATEGORIES_TYPE) {
       return [
-        'id' => ['required', 'exists:room,id'],
+        'id' => ['required', 'exists:rooms,id'],
         'category' => ['required', 'exists:categories,id'],
         'types' => ['required', 'array'],
         'types.*.id' => ['required', 'exists:cost_types,id'],

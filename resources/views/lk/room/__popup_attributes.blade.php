@@ -15,7 +15,7 @@
 
         @foreach($category->attributes as $attr)
           <div class="choice">
-            <input type="checkbox" id="attr-{{$attr->id}}" value="{{ $attr->id }}" name="attr[{{$attr->id}}]" >
+            <input type="checkbox" data-placeholder="{{ $attr->name }}" id="attr-{{$attr->id}}" value="{{ $attr->id }}" name="attr[{{$attr->id}}]" >
             <div class="check">
               <div class="check__flag"></div>
             </div>

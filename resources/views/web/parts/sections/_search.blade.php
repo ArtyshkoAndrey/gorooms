@@ -129,17 +129,17 @@
                                     <p class="advanced-search-prices-in-label">Период размещения:</p>
                                     <ul class="advanced-search-prices-list">
                                         <li class="advanced-search-prices-item ">
-                                            <input id="advanced-search-prices-1" type="radio" class="checkbox" name="search-price" value="hour" @checked('hour', request('search-price'))>
+                                            <input id="advanced-search-prices-1" type="checkbox" class="checkbox" name="search-price" value="hour" @checked('hour', request('search-price'))>
                                             <label for="advanced-search-prices-1" class="checkbox-label checkbox-label-orange">На
                                                 час</label>
                                         </li>
                                         <li class="advanced-search-prices-item">
-                                            <input id="advanced-search-prices-2" type="radio" class="checkbox" name="search-price" value="night" @checked('night', request('search-price'))>
+                                            <input id="advanced-search-prices-2" type="checkbox" class="checkbox" name="search-price" value="night" @checked('night', request('search-price'))>
                                             <label for="advanced-search-prices-2" class="checkbox-label checkbox-label-orange">На
                                                 ночь</label>
                                         </li>
                                         <li class="advanced-search-prices-item">
-                                            <input id="advanced-search-prices-3" type="radio" class="checkbox" name="search-price" value="day" @checked('day', request('search-price'))>
+                                            <input id="advanced-search-prices-3" type="checkbox" class="checkbox" name="search-price" value="day" @checked('day', request('search-price'))>
                                             <label for="advanced-search-prices-3" class="checkbox-label checkbox-label-orange">На
                                                 сутки</label>
                                         </li>
@@ -219,16 +219,6 @@
                                            class="checkbox-label checkbox-label-light">{{ $attribute->name }}</label>
                                 </li>
                             @endforeach
-
-                            @moderator
-                            <li class="advanced-search-details-item">
-                                <input id="advanced-search-hotel-moderate" type="checkbox"
-                                       @if(isset($request) && optional($request)->has('hotel_moderate')) checked @endif
-                                       name="hotel_moderate" class="checkbox">
-                                <label for="advanced-search-hotel-moderate"
-                                       class="checkbox-label checkbox-label-light">На модерации</label>
-                            </li>
-                            @endmoderator
                         </ul>
                     </div>
                 </div>
@@ -248,19 +238,28 @@
                                            class="checkbox-label checkbox-label-light">{{ $attribute->name }}</label>
                                 </li>
                             @endforeach
-
-                            @moderator
-                                <li class="advanced-search-details-item">
-                                    <input id="advanced-search-rooms-moderate" type="checkbox"
-                                           @if(isset($request) && optional($request)->has('room_moderate')) checked @endif
-                                           name="room_moderate" class="checkbox">
-                                    <label for="advanced-search-rooms-moderate"
-                                           class="checkbox-label checkbox-label-light">На модерации</label>
-                                </li>
-                            @endmoderator
                         </ul>
                     </div>
                 </div>
+                @moderator
+                    <div class="col-lg-12 advanced-search-details-col">
+                        <p class="advanced-search-title">Модерация</p>
+                        <div class="filter-collapse js-search-collapse">
+                            <ul class="advanced-search-details-list">
+
+                                <li class="advanced-search-details-item">
+                                    <input id="advanced-search-moderate" type="checkbox"
+                                           @if(isset($moderate))
+                                            {{ $moderate ? 'checked' : '' }}
+                                           @endif
+                                           name="moderate" value="true" class="checkbox">
+                                    <label for="advanced-search-moderate"
+                                           class="checkbox-label checkbox-label-light">На модерации</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                @endmoderator
             </div>
         </div>
     </div>

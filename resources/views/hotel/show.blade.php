@@ -155,14 +155,14 @@ use App\Models\Hotel;
             <ul class="room-prices block-desktop">
               @foreach($hotel->minimals AS $minimal)
                 <li class="room-prices-item" itemprop="priceRange">
-                  @if($minimal->value !== 0)
+                  @if((int) $minimal->value !== 0)
                     <strong class="room-prices-item-price">{{ $minimal->name ?? '' }}
                        -
                       от {{ $minimal->value ?? '' }} руб.</strong>
                     <span class="room-prices-item-info">{{ $minimal->info ?? '' }}</span>
                   @else
                     <strong class="room-prices-item-price">{{ $minimal->name ?? '' }}
-                      - {{ $minimal->info ?? '' }}</strong>
+                      - Не предоставляется</strong>
                   @endif
                 </li>
               @endforeach
@@ -256,14 +256,14 @@ use App\Models\Hotel;
         <ul class="room-prices">
           @foreach($hotel->minimals AS $minimal)
             <li class="room-prices-item">
-              @if($minimal->value !== 0)
+              @if((int)$minimal->value !== 0)
                 <strong class="room-prices-item-price">{{ $minimal->name ?? '' }}
                   -
                   от {{ $minimal->value ?? '' }} руб.</strong>
                 <span class="room-prices-item-info">{{ $minimal->info ?? '' }}</span>
               @else
                 <strong class="room-prices-item-price">{{ $minimal->name ?? '' }}
-                  - {{ $minimal->info ?? '' }}</strong>
+                  - Не предоставляется</strong>
               @endif
             </li>
           @endforeach

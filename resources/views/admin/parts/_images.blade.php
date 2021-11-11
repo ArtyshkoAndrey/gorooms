@@ -20,9 +20,6 @@
                 <img src="{{ asset($image->path) }}" class="img-fluid img-thumbnail"
                      @if($image->default) style="border: 2px solid black" @endif alt="">
                 <div class="btn-group btn-group-sm w-100 mt-1">
-                    <button type="button" class="btn btn-primary" onclick="window.setDefault({{ $image->id }})">
-                        <i class="fa fa-check-square-o" aria-hidden="true"></i>
-                    </button>
                     <button type="button" class="btn btn-danger" onclick="window.deleteImage({{ $image->id }})">
                         <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>

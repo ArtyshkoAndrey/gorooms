@@ -41,7 +41,6 @@ use Illuminate\Notifications\DatabaseNotificationCollection;
  * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property-read int|null                                              $notifications_count
  * @property-read mixed                                                 $personal_hotel
- *
  * @method static bool|null forceDelete()
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()

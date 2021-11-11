@@ -41,7 +41,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
                 @auth
-                <ul class="navbar-nav mr-auto">
+                <ul class="navbar-nav mr-auto d-flex align-items-center">
                     <li class="nav-item">
                         <a href="{{ route('admin.hotels.index') }}" class="nav-link">Список отелей</a>
                     </li>
@@ -83,6 +83,9 @@
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('admin.descriptions.index') }}" class="nav-link">Описания</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.instructions.index') }}" class="nav-link">Инструкции</a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('admin.settings.index') }}" class="nav-link">Настройки</a>
@@ -155,6 +158,7 @@
 <script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@20.3.0/dist/js/jquery.suggestions.min.js"></script>
 <script src="https://cdn.tiny.cloud/1/ghdxavsus8orb1hk0kqxhd7ncwttt1anujdh4p7lmje0oiak/tinymce/5/tinymce.min.js"
         referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/z826n1n5ayf774zeqdphsta5v2rflavdm2kvy7xtmczyokv3/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 
 <script>
     $("#address").suggestions({
@@ -197,6 +201,8 @@
             imagesPreview(this, 'div.images');
         });
     });
+
 </script>
+@yield('js')
 </body>
 </html>

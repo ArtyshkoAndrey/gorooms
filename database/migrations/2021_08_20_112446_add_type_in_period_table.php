@@ -22,6 +22,10 @@ class AddTypeInPeriodTable extends Migration
   public function up(): void
   {
     Schema::table('periods', function (Blueprint $table) {
+      $table->dropColumn(['cost_type_id']);
+    });
+
+    Schema::table('periods', function (Blueprint $table) {
       $table->foreignId('cost_type_id')
         ->after('end_at')
         ->constrained('cost_types')

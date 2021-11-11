@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Route;
 use App\User;
 use Eloquent;
 use Exception;
@@ -14,6 +13,7 @@ use Illuminate\Support\Carbon;
 use App\Traits\CreatedAtOrdered;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -170,7 +170,7 @@ class Hotel extends Model
    *
    * @return void
    */
-  protected static function boot (): void
+  protected static function boot(): void
   {
     parent::boot();
 
@@ -183,10 +183,34 @@ class Hotel extends Model
           !Route::currentRouteNamed('api.*') &&
           !Route::currentRouteNamed('admin.*')
         ) {
-          $builder->where('moderate', false)->where('show', true);
+//          Если залогинен значит выводим только проверенные отели в которых есть комнаты
+          $builder
+            ->withCount(['rooms' => function ($query) {
+              $query->withoutGlobalScope('moderation')->where('moderate', false);
+            }])
+            ->having('rooms_count', '>', 0)
+            ->where('moderate', false)
+            ->where('old_moderate', true)
+            ->where('show', true);
+        } else if (
+          (auth()->user()->is_moderate || auth()->user()->is_admin) &&
+          !Route::currentRouteNamed('admin.*') &&
+          !Route::currentRouteNamed('moderator.*')
+        ) {
+//          Если модератор то показываем отели только те которые уже заполнили и создавали ранее комнату
+          $builder
+            ->where('old_moderate', true);
         }
+//        Если залогинен н админ то выводим просто всё
       } else {
-        $builder->where('moderate', false)->where('show', true);
+//        Если не залогинен значит выводим только проверенные отели в которых есть комнаты
+        $builder->withCount(['rooms' => function ($query) {
+          $query->withoutGlobalScope('moderation')->where('moderate', false);
+        }])
+          ->where('moderate', false)
+          ->where('show', true)
+          ->where('old_moderate', true)
+          ->having('rooms_count', '>', 0);
       }
     });
 
@@ -237,7 +261,7 @@ class Hotel extends Model
 
   ### RELATIONS
 
-  public function scopePopular (Builder $query): Builder
+  public function scopePopular(Builder $query): Builder
   {
     return $query->where('is_popular', true);
   }
@@ -247,17 +271,17 @@ class Hotel extends Model
    *
    * @return BelongsToMany
    */
-  public function users (): belongsToMany
+  public function users(): belongsToMany
   {
     return $this->belongsToMany(User::class);
   }
 
-  public function user (): BelongsTo
+  public function user(): BelongsTo
   {
     return $this->belongsTo(User::class);
   }
 
-  public function attrs (): BelongsToMany
+  public function attrs(): BelongsToMany
   {
     return $this->belongsToMany(Attribute::class, 'attribute_hotel', 'hotel_id', 'attribute_id');
   }
@@ -267,7 +291,7 @@ class Hotel extends Model
    *
    * @return HasMany
    */
-  public function categories (): HasMany
+  public function categories(): HasMany
   {
     return $this->hasMany(Category::class)->orderBy('created_at');
   }
@@ -277,17 +301,17 @@ class Hotel extends Model
    *
    * @return BelongsTo
    */
-  public function type (): BelongsTo
+  public function type(): BelongsTo
   {
     return $this->belongsTo(HotelType::class);
   }
 
-  public function reviews (): HasMany
+  public function reviews(): HasMany
   {
     return $this->hasMany(Review::class)->with('ratings');
   }
 
-  public function ratings (): HasManyThrough
+  public function ratings(): HasManyThrough
   {
     return $this->hasManyThrough(Rating::class, Review::class);
   }
@@ -297,7 +321,7 @@ class Hotel extends Model
    *
    * @return HasMany
    */
-  public function metros (): HasMany
+  public function metros(): HasMany
   {
     return $this->hasMany(Metro::class);
   }
@@ -309,7 +333,7 @@ class Hotel extends Model
    *
    * @return string|null
    */
-  public function getPhoneAttribute ($value): ?string
+  public function getPhoneAttribute($value): ?string
   {
     if (!$this->hide_phone && !\Request::is('admin/*') && !\Request::is('lk/*') && !\Request::is('moderator/*')) {
       $value = null;
@@ -323,7 +347,7 @@ class Hotel extends Model
    *
    * @return string
    */
-  public function getMetaDescriptionAttribute (): string
+  public function getMetaDescriptionAttribute(): string
   {
     return @$this->meta->meta_description ?? $this->getDescDefault();
   }
@@ -331,15 +355,15 @@ class Hotel extends Model
 
   ### MUTATORS
 
-  private function getDescDefault (): string
+  private function getDescDefault(): string
   {
     $desc = "%s %s %sв г. %s: большая база почасовых отелей с описанием номеров. Сортировка по районам, метро, округам и стоимости и скидки на проживание!";
-    $costs = (array) $this->getMinCosts();
+    $costs = (array)$this->getMinCosts();
 
     if (current($costs)) {
       $cost = current($costs);
       if (isset($cost["value"]))
-    	$cost = "по цене " . $cost['value'] . " руб. на час ";
+        $cost = "по цене " . $cost['value'] . " руб. на час ";
       else
         $cost = "";
     } else {
@@ -354,7 +378,7 @@ class Hotel extends Model
    *
    * @return object
    */
-  public function getMinCosts (): object
+  public function getMinCosts(): object
   {
     Cache::flush();
     $costs = Cache::remember('hotel.' . $this->id . '.costs', 60 * 60 * 24 * 12, function () {
@@ -370,7 +394,11 @@ class Hotel extends Model
                 $q->where('cost_type_id', $type_id);
               })->where('value', '>', 0)->min('value') ?? '0';
           });
-          $item = (object) ['name' => $cost->period->type->name, 'id' => $cost->period->type->id, 'description' => $cost->description, 'info' => $cost->period->info, 'value' => $min_in_rooms,];
+
+          $costPeriod = $this->costs->where('value', $min_in_rooms)->where('period.cost_type_id', $type_id)->first();
+          $cost = $costPeriod ?? $cost;
+
+          $item = (object)['name' => $cost->period->type->name, 'id' => $cost->period->type->id, 'description' => $cost->description, 'info' => $cost->period->info, 'value' => $min_in_rooms,];
           $items->add($item);
         }
       }
@@ -380,10 +408,10 @@ class Hotel extends Model
       foreach ($types as $type) {
         $check = $items->contains('id', $type->id);
         if (!$check) {
-          $costs->add((object) [
+          $costs->add((object)[
             'name' => $type->name,
             'info' => 'Не предоставляется',
-            'value' => 0
+            'value' => 0,
           ]);
         } else {
           $costs->add($items->firstWhere('id', '=', $type->id));
@@ -392,10 +420,8 @@ class Hotel extends Model
 
       return $costs;
     });
-    debug(1);
-    debug($costs);
 
-    return (object) $costs;
+    return (object)$costs;
   }
 
   /**
@@ -403,9 +429,9 @@ class Hotel extends Model
    *
    * @return Collection
    */
-  public function getCostsAttribute (): Collection
+  public function getCostsAttribute(): Collection
   {
-    return $this->rooms()->get()->pluck('costs')->flatten();
+    return $this->rooms()->with('costs.period')->get()->pluck('costs')->flatten();
   }
 
   /**
@@ -413,12 +439,12 @@ class Hotel extends Model
    *
    * @return HasMany
    */
-  public function rooms (): HasMany
+  public function rooms(): HasMany
   {
     return $this->hasMany(Room::class)->orderBy('order', 'ASC');
   }
 
-  public function getMetaKeywordsAttribute ()
+  public function getMetaKeywordsAttribute()
   {
     return @$this->meta->meta_keywords ?? null;
   }
@@ -427,12 +453,12 @@ class Hotel extends Model
 
   ### FUNCTIONS
 
-  public function getMetaTitleAttribute ()
+  public function getMetaTitleAttribute()
   {
     return @$this->meta->title ?? $this->getTitleDefault();
   }
 
-  private function getTitleDefault ()
+  private function getTitleDefault()
   {
     $street = optional($this->address)->street;
     $area_short = optional($this->address)->city_area_short;
@@ -441,7 +467,7 @@ class Hotel extends Model
     return "Отель {$this->name}, {$street}, в {$area_short}, у метро {$metro}";
   }
 
-  public function saveAddress (string $address_raw, $comment = null): void
+  public function saveAddress(string $address_raw, $comment = null): void
   {
     $address = $this->getAddressInfo($address_raw);
     $address['comment'] = empty($comment) ? null : $comment;
@@ -450,7 +476,7 @@ class Hotel extends Model
     $this->save();
   }
 
-  public function getAddressInfo (string $address): array
+  public function getAddressInfo(string $address): array
   {
     $suggest = DadataSuggest::suggest('address', ['query' => $address, 'count' => 1]);
     $suggest['data']['value'] = $suggest['value'];
@@ -463,12 +489,12 @@ class Hotel extends Model
    *
    * @return HasOne
    */
-  public function address (): HasOne
+  public function address(): HasOne
   {
     return $this->hasOne(Address::class);
   }
 
-  public function attachMeta (Request $request): Hotel
+  public function attachMeta(Request $request): Hotel
   {
     if (!$request->get('meta_title', false) && !$request->get('meta_description', false) && !$request->get('meta_keywords', false)) return $this;
 
@@ -498,7 +524,7 @@ class Hotel extends Model
 
   ### OVERWRITES
 
-  public function meta (): HasOne
+  public function meta(): HasOne
   {
     return $this->hasOne(PageDescription::class, 'model_id')->where('model_type', self::class);
   }
@@ -510,14 +536,14 @@ class Hotel extends Model
    *
    * @return mixed
    */
-  public function __get ($key)
+  public function __get($key)
   {
     if ($key === 'minimals') return $this->getMinCosts();
 
-    return parent::__get($key); // TODO: Change the autogenerated stub
+    return parent::__get($key);
   }
 
-  public function getRouteKeyName ()
+  public function getRouteKeyName()
   {
     return 'slug';
   }
@@ -528,9 +554,9 @@ class Hotel extends Model
    *
    * @return string
    */
-  public function getDisabledSaveAttribute (): string
+  public function getDisabledSaveAttribute(): string
   {
-    if (auth()->user()->is_moderate || !$this->old_moderate) {
+    if (!$this->old_moderate) {
       return '';
     }
     return 'disabled';

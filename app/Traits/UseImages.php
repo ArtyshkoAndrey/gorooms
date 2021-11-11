@@ -18,17 +18,17 @@ trait UseImages
 
     public function images(): MorphMany
     {
-        return $this->morphMany(Image::class, 'model')->orderBy('created_at', 'DESC');
+        return $this->morphMany(Image::class, 'model')->orderBy('order', 'ASC');
     }
 
     public function image(): HasOne
     {
-        return $this->hasOne(Image::class, 'model_id', 'id')
-            ->where('model_type', '=', self::class)
-            ->where('default', true)
-            ->withDefault([
-                'path' => $this->no_image ?? Image::DEFAULT
-            ]);
+      return $this->hasOne(Image::class, 'model_id', 'id')
+        ->where('model_type', '=', self::class)
+        ->orderBy('order', 'ASC')
+        ->withDefault([
+          'path' => $this->no_image ?? Image::DEFAULT
+        ]);
     }
 
     protected static function bootUseImages()
