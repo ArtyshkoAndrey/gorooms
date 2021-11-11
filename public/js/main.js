@@ -494,10 +494,16 @@ $(document).ready(function () {
             success: function (data) {
                 let items = ""
 
-                for (let i = 0; i < data.items.length; i++) {
-                    const element = data.items[i];
+                if (typeof data.items == "object") {
+                    data = Object.values(data.items);
+                } else {
+                    data = data.items;
+                }
 
-                    items += "<div class='item'>" + element + "</div>";
+                for (let i = 0; i < data.length; i++) {
+                  let element = data[i];
+
+                  items += "<div class='item'>" + element + "</div>";
                 }
 
                 $("#autocomplete").empty();

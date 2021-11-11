@@ -4295,9 +4295,7 @@ button.modal-close:focus {
   }
 }
 @media (max-width: 991px) {
-  #autocomplete{
-    width: calc(100% - 20px);
-  }
+
   /*=HEADER=*/
   .header-top {
     padding-bottom: 0;
@@ -5846,4 +5844,10 @@ button.modal-close:focus {
 .pagination-sm .page-item:last-child .page-link {
   border-top-right-radius: 0.2rem;
   border-bottom-right-radius: 0.2rem;
+}
+
+@media (max-width: 991px) {
+  #autocomplete{
+    width: calc(100% - 20px);
+  }
 }
