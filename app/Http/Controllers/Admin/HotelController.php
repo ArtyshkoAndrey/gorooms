@@ -19,16 +19,25 @@ use Illuminate\Http\RedirectResponse;
 
 class HotelController extends Controller
 {
-  /**
-   * Display a listing of the resource.
-   *
-   * @return Response
-   */
-  public function index(): View
-  {
-    $hotels = Hotel::all();
-    return view('admin.hotel.index', compact('hotels'));
-  }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request): View
+    {
+        $search = '';
+
+        if($request->has('search')) {
+            $search = $request->input('search');
+
+            $hotels = Hotel::query()->where('name', 'LIKE', "%{$search}%")->paginate(20);
+        } else {
+            $hotels = Hotel::paginate(20);
+        }
+        
+        return view('admin.hotel.index', compact('hotels', 'search'));
+    }
 
   /**
    * Show the form for creating a new resource.
@@ -41,6 +50,20 @@ class HotelController extends Controller
     $costTypes = CostType::orderBy('sort')->get();
     $hotelTypes = HotelType::orderBy('sort')->get();
     return view('admin.hotel.create', compact('attributes', 'costTypes', 'hotelTypes'));
+  }
+
+  public function block(Hotel $hotel)
+  {
+    $hotel->block();
+
+    return redirect()->back()->with('message', __('messages.hotel_blocked', ['name' => $hotel->name]));
+  }
+
+  public function unblock(Hotel $hotel)
+  {
+    $hotel->unblock();
+
+    return redirect()->back()->with('message', __('messages.hotel_unblocked', ['name' => $hotel->name]));
   }
 
   /**

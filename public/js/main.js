@@ -109,6 +109,16 @@ $(document).ready(function () {
     }
 
     //advanced-search
+    $(".search-tags button").on("click", function (e) {
+        e.preventDefault();
+
+        dataFor = $(this).data("for");
+
+        $("#" + dataFor).prop("checked", !$("#" + dataFor).prop("checked"));
+        
+        $(".search-bottom-in .btn.btn-blue").trigger("click");
+    });
+
     $('#js-advanced-search-open-btn').on('click', function (e) {
         e.stopPropagation();
         e.preventDefault();
@@ -459,6 +469,7 @@ $(document).ready(function () {
         $(hotelName).show();
         $(hotelAddress).show();
         $(hotelMetro).addClass('open');
+        $(".block-desktop.metro-rwd").hide();
     });
     //datalist
     $('.flexdatalist').flexdatalist({
@@ -466,11 +477,46 @@ $(document).ready(function () {
         minLength: 0
     })
 
+    $("#autocomplete").on("click", ".item", function () {
+        let hint = $(this).text();
+
+        $("#search").val(hint);
+        $("#autocomplete").empty();
+    });
+
+    $("#search").on("input", function () {
+        let query = $(this).val();
+
+        $.ajax({
+          url: "api/hint",
+          data: { query: query },
+          dataType: "JSON",
+            success: function (data) {
+                let items = ""
+
+                if (typeof data.items == "object") {
+                    data = Object.values(data.items);
+                } else {
+                    data = data.items;
+                }
+
+                for (let i = 0; i < data.length; i++) {
+                  let element = data[i];
+
+                  items += "<div class='item'>" + element + "</div>";
+                }
+
+                $("#autocomplete").empty();
+                $("#autocomplete").append(items);
+          },
+        });
+    } );
+
 });
 
 function js_hotel_card_slider_init(){
     $('.js-hotel-card-slider').each(function () {
-        var hotelCardSwiper = new Swiper(this, {
+        window.hotelCardSwiper = new Swiper(this, {
             navigation: {
                 nextEl: this.querySelector('.swiper-button.swiper-button-next'),
                 prevEl: this.querySelector('.swiper-button.swiper-button-prev')
@@ -501,6 +547,8 @@ async function loadMore(e, url, callback = null) {
         $('.items-container').append(html);
         updateCounter(html);
     }
+    window.hotelCardSwiper.destroy();
+    js_hotel_card_slider_init();
     loading = false;
     js_hotel_card_slider_init()
 
@@ -598,7 +646,9 @@ function SearchFilters() {
             let district = '';
             let metro = '';
             let type = '';
-            if(dataUrl.length > 0) {
+
+            
+            if (dataUrl.length > 0) {
                 for(const item of dataUrl) {
                     if(item['name'] === 'address[city_area]') {
                         area = item['value'].replace('+', ' ');
@@ -625,8 +675,49 @@ function SearchFilters() {
                 await districtInit();
                 await changeForm();
                 await fn();
+            } else if (typeof SearchData != "undefined") {
+              if (SearchData["city"] != "") {
+                city = SearchData["city"];
+              }
+              if (SearchData["district"] != "") {
+                district = SearchData["district"];
+              }
+              if (SearchData["metro"] != "") {
+                metro = SearchData["metro"];
+              }
+              if (SearchData["area"] != "") {
+                area = SearchData["area"];
+              }
+
+              await selectMetro
+                .find(`option[value="${metro}"]`)
+                .prop("selected", true)
+                .trigger("change")
+                .trigger("refresh");
+              await selectType
+                .find(`option[value="${type}"]`)
+                .prop("selected", true)
+                .trigger("change")
+                .trigger("refresh");
+              await selectArea
+                .find(`option[value="${area}"]`)
+                .prop("selected", true)
+                .trigger("change")
+                .trigger("refresh");
+              const districtInit = () => {
+                if (selectDistrict.find(`option[value="${district}"]`)) {
+                  selectDistrict
+                    .find(`option[value="${district}"]`)
+                    .prop("selected", true)
+                    .trigger("change")
+                    .trigger("refresh");
+                }
+              };
+              await districtInit();
+              await changeForm();
+              await fn();
             } else {
-                fn()
+              fn();
             }
         }
     };
@@ -672,6 +763,7 @@ function SearchFilters() {
     }
 
     this.loadArea = async function (data) {
+        console.log(data);
         const select = this.containers.area.select;
         this.clearSelect(select);
         let uniqueArea = new Set(
@@ -780,4 +872,17 @@ function changeForm() {
     } else {
         element.fireEvent("onchange");
     }
+}
+
+function search_reset() {
+    $("#js-advanced-search textarea, #js-advanced-search input[type='text']").val("");
+    $("#js-advanced-search input, #js-advanced-search textarea").trigger("refresh");
+
+    $("#js-advanced-search input[type='checkbox']").prop("checked", false);
+    $("#js-advanced-search input[type='checkbox']").trigger("refresh");
+
+    $("#js-advanced-search select").prop("selectedIndex", 0);
+    $("#js-advanced-search select").trigger("refresh");
+
+    $("label[for='advanced-search-prices-1']").trigger("click");
 }

@@ -1,7 +1,12 @@
 @extends('layouts.admin')
 
-@section('content')
-    <div class="container">
+        @section('content')
+            <div class="container">
+                @if(session()->has('message'))
+            <div class="alert alert-success">
+                {{ session()->get('message') }}
+            </div>
+        @endif
         <div class="card">
             <div class="card-header">
                 <div class="d-flex w-100 justify-content-between align-items-center">
@@ -10,6 +15,12 @@
                 </div>
             </div>
             <div class="card-body">
+                <form class="form-inline float-right" method="get">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <input class="form-control" name="search" placeholder="Поиск" value="{{ $search }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Поиск</button>
+                </form>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -34,7 +45,11 @@
                                 <td>
                                     <div class="btn-group btn-group-sm">
                                         <a href="{{ route('admin.hotels.edit', $hotel) }}" class="btn btn-success">Изменить</a>
-                                        <a href="{{ route('admin.rooms.create', $hotel) }}" class="btn btn-primary">Создать номер</a>
+                                        @if($hotel->show)
+                                            <a href="{{ route('admin.hotels.block', $hotel) }}" class="btn btn-primary">Заблокировать отель</a>
+                                        @else
+                                            <a href="{{ route('admin.hotels.unblock', $hotel) }}" class="btn btn-primary">Разблокировать отель</a>
+                                        @endif
                                         <button type="button" data-action="{{ route('admin.hotels.destroy', $hotel) }}" class="btn btn-danger js-delete">Удалить</button>
                                     </div>
                                 </td>
@@ -43,6 +58,7 @@
                         </tbody>
                     </table>
                 </div>
+                {{ $hotels->render() }}
             </div>
         </div>
     </div>

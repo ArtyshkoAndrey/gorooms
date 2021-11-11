@@ -209,11 +209,11 @@
                                            value="{{ Settings::option($type.'_cost_small') }}"
                                            placeholder="Цена минимум">
                                 </div>
-                                <div class="col-12 col-md-4">
+                                {{-- <div class="col-12 col-md-4">
                                     <input type="number" class="form-control" name="{{ $type }}_cost_medium"
                                            value="{{ Settings::option($type.'_cost_medium') }}"
                                            placeholder="Цена средне">
-                                </div>
+                                </div> --}}
                                 <div class="col-12 col-md-4">
                                     <input type="number" class="form-control" name="{{ $type }}_cost_low"
                                            value="{{ Settings::option($type.'_cost_low') }}"

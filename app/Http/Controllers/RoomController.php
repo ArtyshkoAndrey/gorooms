@@ -16,12 +16,21 @@ use Illuminate\View\View;
 class RoomController extends Controller
 {
 
-  public function index(): View
+  public function index(Request $request): View
   {
-    $rooms = Room::paginate(20);
-    $hide_filter = false;
+    $sortByRequested = [
+      'cost' => false,
+    ];
 
-    return view('room.index', compact('rooms', 'hide_filter'));
+    if ($request->has('cost')) {
+      $sortByRequested['cost'] = $orderCost = $request->input('cost');
+
+      $rooms = Room::orderByCost($orderCost)->paginate(18);
+    } else {
+      $rooms = Room::paginate(20);
+    }
+
+    return view('room.index', compact('rooms', 'sortByRequested'));
   }
 
   public function hot(): View

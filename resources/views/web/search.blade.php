@@ -22,7 +22,7 @@
   <section class="section">
     <div class="container">
       @if ($with_map)
-        <h1 class="section-title">{{ @$pageDescription->title ?? $title }}</h1>
+        <h1 class="section-title">{!! @$pageDescription->title ?? $title !!}</h1>
         <div class="map-search-wrapper">
           <div id="map" style="width: 100%; height: 600px;"></div>
         </div>
@@ -117,6 +117,15 @@
         </div>
       </div>
     @endif
+
+    <div class="container">
+      <div class="show-more">
+        <p class="show-more-counter">Загружено: {{ $rooms->count() }} ({{ $rooms->total()}})</p>
+          @if($rooms->total() > $rooms->count())
+            <button id="rooms-load-more" class="show-more-btn" type="button">Загрузить еще</button>
+          @endif
+      </div>
+    </div>
 
     @if($moderate ?? false)
       <div class="container">

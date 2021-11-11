@@ -83,9 +83,11 @@
         <div class="form-group col-12 col-md-6">
         	<label for="cost_{{$costType->id}}">Период</label>
         	<select class="form-control" name="cost[{{ $costType->id }}][period]">
-        		@foreach($costType->periods as $period)
-                    <option value="{{ $period->id }}" {{ $costRoom ? $costRoom->period->id === $period->id ? 'selected' : '' : ''  }}>{{ $period->info }}</option>
-                 @endforeach
+                @if(isset($room))
+        		    @foreach($costType->periods as $period)
+                        <option value="{{ $period->id }}" {{ $costRoom ? $costRoom->period->id === $period->id ? 'selected' : '' : ''  }}>{{ $period->info }}</option>
+                    @endforeach
+                @endif
         	</select>
         </div>
         <input type="hidden" name="cost[{{ $costType->id }}][type_id]" value="{{$costType->id}}">
