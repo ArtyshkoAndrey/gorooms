@@ -163,6 +163,13 @@
         <a href="" class="btn btn-orange btn-block" data-href="#book-popup" data-toggle="modal"
            data-target="#book-popup" data-action="{{ route('booking.room', $room->id) }}"
            onclick="showFormBookRoom('{{$room->id}}')">Забронировать</a>
+          @if ($room->phone || $room->hotel->phone)
+            <p class="show-tel-wrapper">
+              <button class="btn btn-blue btn-block js-show-tel-btn" type="button">Показать телефон</button>
+              <a href="tel:{{ $room->phone ?? $room->hotel->phone }}"
+                class="btn btn-blue btn-block tel-link js-tel-link">{{ $room->phone ?? $room->hotel->phone }}</a>
+            </p>
+          @endif
         @endif
         @moderator
           <a href="{{ route('moderator.room.edit', $hotel->id) }}" class="btn btn-orange btn-block {{ !$room->moderate ? 'btn-moderator-edit' : '' }}">Редактировать</a>

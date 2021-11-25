@@ -49,6 +49,7 @@ class Attribute extends Model
     'name',
     'description',
     'model',
+    'attribute_category_id',
     'in_filter'
   ];
 
