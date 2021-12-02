@@ -24,9 +24,9 @@ class AddressController extends Controller
         $address->where('street', $street);
 
       $hotels = $address->get()->map(function ($item) {
-//        dump($item->hotel);
-        if ($item->hotel) {
-          return $item->hotel->id;
+      //  dump($item->hotel_id);
+        if ($item->hotel_id) {
+          return $item->hotel_id;
         }
       });
       $collection = $this->modifyCollection($address->get());
