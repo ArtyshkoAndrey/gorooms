@@ -418,31 +418,31 @@ $(document).ready(function () {
     $('#hotel-page-load-more').click(async function (e) {
         const hotelId = window.location.pathname.split('/')[2];
         hotelPageNumber++
-        await loadMore(e, `public/render/hotels/${hotelId}?page=${hotelPageNumber}`);
+        await loadMore(e, `/public/render/hotels/${hotelId}?page=${hotelPageNumber}`);
     });
 
     let roomPageCount = 1;
     $('#rooms-load-more').click(async function (e) {
         roomPageCount++
-        await loadMore(e, `public/render/rooms/?page=${roomPageCount}`);
+        await loadMore(e, `/public/render/rooms/?page=${roomPageCount}`);
     });
 
 
     let hotelPageCount = 1;
     $('#hotels-load-more').click(async function (e) {
         hotelPageCount++
-        await loadMore(e, `public/render/hotels/?page=${hotelPageCount}`);
+        await loadMore(e, `/public/render/hotels/?page=${hotelPageCount}`);
     });
 
 
     $('#room-page-load-more').click(async function (e) {
         const roomId = 1;
-        await loadMore(e, `public/render/room/${roomId}`);
+        await loadMore(e, `/public/render/room/${roomId}`);
     });
 
     $('#review-show-more').click(async function (e) {
         const hotelId = 1;
-        await loadMore(e, `public/render/review/${hotelId}`);
+        await loadMore(e, `/public/render/review/${hotelId}`);
     });
 
     function detectMob() {
