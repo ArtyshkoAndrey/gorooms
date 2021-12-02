@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\LK;
+namespace App\Http\Requests\Moderate;
 
 use App\Models\Metro;
 use App\User;
