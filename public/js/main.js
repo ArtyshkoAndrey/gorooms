@@ -424,14 +424,14 @@ $(document).ready(function () {
     let roomPageCount = 1;
     $('#rooms-load-more').click(async function (e) {
         roomPageCount++
-        await loadMore(e, `/public/render/rooms/?page=${roomPageCount}`);
+        await loadMore(e, `/public/render/rooms?page=${roomPageCount}`);
     });
 
 
     let hotelPageCount = 1;
     $('#hotels-load-more').click(async function (e) {
         hotelPageCount++
-        await loadMore(e, `/public/render/hotels/?page=${hotelPageCount}`);
+        await loadMore(e, `/public/render/hotels?page=${hotelPageCount}`);
     });
 
 
