@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use URL;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Builder;
@@ -39,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
    */
   public function boot(): void
   {
+    URL::forceScheme('https');
     Schema::defaultStringLength(191);
     Paginator::useBootstrap();
     $this->bootBuilderMacroses();
