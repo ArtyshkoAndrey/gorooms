@@ -216,7 +216,7 @@ class Hotel extends Model
 
 
     self::creating(function (Hotel $hotel) {
-      $hotel->slug = $hotel->slug ?? Str::slug($hotel->name);
+      $hotel->slug = $hotel->slug ?? Str::slug($hotel->name . '-' . Str::random(2));
       Cache::forget('sitemap.2g');
     });
 
