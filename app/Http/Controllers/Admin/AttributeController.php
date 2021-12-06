@@ -35,7 +35,9 @@ class AttributeController extends Controller
      */
     public function create(): View
     {
-        return view('admin.attributes.create');
+        $attributeCategories = AttributeCategory::all();
+
+        return view('admin.attributes.create', compact('attributeCategories'));
     }
 
     /**
