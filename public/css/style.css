@@ -5214,6 +5214,15 @@ button.modal-close:focus {
     margin-top: 22px;
   }
 
+  .block-desktop.metro-rwd .name-metro{
+    text-overflow: ellipsis;
+    max-width: calc(100% - 84px);
+    overflow: hidden;
+    white-space: nowrap;
+    height: 17px;
+    display: inline-block;
+  }
+
   .block-desktop.metro-rwd .room-metro .metro {
     display: none;
   }
