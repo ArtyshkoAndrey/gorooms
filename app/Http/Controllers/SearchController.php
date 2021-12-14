@@ -126,6 +126,7 @@ class SearchController extends Controller
         if ($request->has('room_moderate')) {
           $rooms->where('moderate', 1);
         }
+        
         foreach ($query_args as $arg) {
           $rooms->where('name', 'LIKE', $arg)->orWhereHas('hotel.address', function (Builder $builder) use ($arg) {
             $builder->where('value', 'LIKE', $arg);
@@ -490,56 +491,68 @@ class SearchController extends Controller
       return response()->json([], 200);
     }
 
-    $query .= "%";
-
     $items = [];
 
-    $hotels = Hotel::where('name', 'LIKE', $query)->get();
+    $search = Search::makeSearchBuilder();
 
-    foreach($hotels as $hotel) {
-      $items[] = $hotel->name;
-    }
+    $query_args = $search->createQueryArray($query);
 
-    $rooms = Room::where('name', 'LIKE', $query)->get();
+    foreach ($query_args as $arg) {
+      // 5 - 3 letters + 2 special symbols - "%"
+      if(strlen($arg) < 5) continue; 
 
-    foreach ($rooms as $room) {
-      $items[] = $room->name;
-    }
+      $arg = substr($arg, 1);
 
-    $metros = Metro::where('name', 'LIKE', $query)->get();
+      $hotels = Hotel::where('name', 'LIKE', $arg)->orWhereHas('address', function (Builder $builder) use ($arg) {
+        $builder->where('value', 'LIKE', $arg);
+      })->get();
 
-    foreach ($metros as $metro) {
-      $items[] = $metro->name;
-    }
+      foreach ($hotels as $hotel) {
+        $items[] = $hotel->name;
+      }
 
-    $addresses_regions = Address::where('region', 'LIKE', $query)->get();
-    
-    foreach ($addresses_regions as $address) {
-      $items[] = $address->region;
-    }
+      $metros = Metro::where('name', 'LIKE', $arg)->get();
 
-    $addresses_cities = Address::where('city', 'LIKE', $query)->get();
+      foreach ($metros as $metro) {
+        $items[] = $metro->name;
+      }
 
-    foreach ($addresses_cities as $address) {
-      $items[] = $address->city;
-    }
+      $rooms = Room::where('name', 'LIKE', $arg)->get();
 
-    $addresses_streets = Address::where('street_with_type', 'LIKE', $query)->get();
+      foreach ($rooms as $room) {
+        $items[] = $room->name;
+      }
 
-    foreach ($addresses_streets as $address) {
-      $items[] = $address->street_with_type;
-    }
+      $addresses_regions = Address::where('region', 'LIKE', $arg)->get();
 
-    $addresses_districts = Address::where('city_district', 'LIKE', $query)->get();
+      foreach ($addresses_regions as $address) {
+        $items[] = $address->region;
+      }
 
-    foreach ($addresses_districts as $address) {
-      $items[] = $address->city_district;
-    }
+      $addresses_cities = Address::where('city', 'LIKE', $arg)->get();
 
-    $addresses_areas = Address::where('city_area', 'LIKE', $query)->get();
+      foreach ($addresses_cities as $address) {
+        $items[] = $address->city;
+      }
 
-    foreach ($addresses_areas as $address) {
-      $items[] = $address->city_area;
+      $addresses_streets = Address::where('street_with_type', 'LIKE', $arg)->get();
+
+      foreach ($addresses_streets as $address) {
+        $items[] = $address->street_with_type;
+      }
+
+      $addresses_districts = Address::where('city_district', 'LIKE', $arg)->get();
+
+      foreach ($addresses_districts as $address) {
+        $items[] = $address->city_district;
+      }
+
+      $addresses_areas = Address::where('city_area', 'LIKE', $arg)->get();
+
+      foreach ($addresses_areas as $address) {
+        $items[] = $address->city_area;
+      }
+
     }
 
     $items = array_unique($items);
