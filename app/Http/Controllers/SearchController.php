@@ -20,6 +20,14 @@ class SearchController extends Controller
     $query = $request->get('query', '');
     $attributes = $request->get('attributes', ['hotel' => [], 'room' => []]);
 
+    $sortByRequested = [
+      'sortByCost' => false,
+    ];
+
+    if ($request->has('sortByCost')) {
+      $sortByRequested['sortByCost'] = $orderCost = $request->input('sortByCost');
+    }
+
     $city = '';
     if (!$request->is('api/*'))
       $city = $request->session()->get('city', Settings::option('city_default', false));
@@ -51,7 +59,14 @@ class SearchController extends Controller
     } else {
 
       if (!$is_room) {
-        $hotels = Hotel::with(['rooms', 'address', 'attrs']);
+        if ($request->has('sortByCost')) {
+          $orderCost = $request->input('sortByCost');
+
+          $hotels = Hotel::orderByCost($orderCost)->with(['rooms', 'address', 'attrs']);
+        } else {
+          $hotels = Hotel::with(['rooms', 'address', 'attrs']);
+        }
+
         if ($request->has('hotel_moderate')) {
           $hotels->where('moderate', 1)->orWhere('show', 0);
         }
@@ -74,6 +89,7 @@ class SearchController extends Controller
           $hotels->whereHas('metros', function (Builder $builder) use ($metro) {
             $builder->whereRaw('LOWER(name) = LOWER(?)', [$metro]);
           });
+
         $hotels = $hotels->get();
         if (count($attributes['hotel'])) {
           $hotels = $hotels->map(function ($hotel) use ($attributes) {
@@ -122,7 +138,14 @@ class SearchController extends Controller
         }
       }
       else {
-        $rooms = Room::with(['hotel', 'hotel.address']);
+        if ($request->has('sortByCost')) {
+          $orderCost = $request->input('sortByCost');
+
+          $rooms = Room::orderByCost($orderCost)->with(['hotel', 'hotel.address']);
+        } else {
+          $rooms = Room::with(['hotel', 'hotel.address']);
+        }
+        
         if ($request->has('room_moderate')) {
           $rooms->where('moderate', 1);
         }
@@ -480,7 +503,7 @@ class SearchController extends Controller
 
     /* END SEO */
 
-    return view('web.search', compact('hotels', 'moderate', 'query', 'rooms', 'with_map', 'title', 'attributes', 'address', 'request', 'pageDescription'));
+    return view('web.search', compact('hotels', 'moderate', 'query', 'rooms', 'with_map', 'title', 'attributes', 'address', 'request', 'pageDescription', 'sortByRequested'));
   }
 
   public function hint(Request $request)
