@@ -158,7 +158,7 @@
                                             <li class="advanced-search-prices-item">
                                                 @php($value = $type.'.between.'.Settings::option($type.'_cost_small').'-'.Settings::option($type.'_cost_low'))
                                                 <input id="advanced-search-prices-{{ $loop->index }}-3" name="cost" type="radio" class="checkbox" value="{{$value}}" @checked($value, optional($request)->get('cost')) >
-                                                <label for="advanced-search-prices-{{ $loop->index }}-3" class="checkbox-label checkbox-label-orange">{{ Settings::option($type.'_cost_medium') }} р. - {{ Settings::option($type.'_cost_low') }}
+                                                <label for="advanced-search-prices-{{ $loop->index }}-3" class="checkbox-label checkbox-label-orange">{{ Settings::option($type.'_cost_small') }} р. - {{ Settings::option($type.'_cost_low') }}
                                                     р</label>
                                             </li>
                                             <li class="advanced-search-prices-item">
