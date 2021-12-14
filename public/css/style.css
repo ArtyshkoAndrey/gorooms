@@ -5297,6 +5297,23 @@ button.modal-close:focus {
   .advanced-search-details-col .advanced-search-title{
     color: #fff;
   }
+
+  .advanced-search-location {
+    display: block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 15px 15px 1px;
+    margin-bottom: 15px;
+    max-width: 720px;
+    background-color: #ff9d45;
+  }
+
+  .advanced-search-location .advanced-search-title{
+    color: #fff;
+  }
 }
 @media (max-width: 480px) {
   /*=LINKS&FORMS=*/
