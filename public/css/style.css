@@ -5763,7 +5763,7 @@ button.modal-close:focus {
 #autocomplete{
   position: absolute;
   width: calc(100% - 40px);
-  z-index: 9;
+  z-index: 999;
 }
 
 #autocomplete .item {
