@@ -6,7 +6,7 @@
             <div class="card-header">
                 <div class="d-flex w-100 justify-content-between align-items-center">
                     <div class="h4 p-0 m-0">Категории атрибутов</div>
-                    <a href="{{ route('admin.attributes_categories.create') }}" class="btn btn-primary btn-sm">Новая категория</a>
+                    <a href="{{ route('admin.attributes_categories.create', $model) }}" class="btn btn-primary btn-sm">Новая категория</a>
                 </div>
             </div>
             <div class="card-body">
@@ -26,8 +26,8 @@
                                 <td>{{ $attribute_category->name }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.attributes_categories.edit', $attribute_category) }}" class="btn btn-success">Изменить</a>
-                                        <button type="button" data-action="{{ route('admin.attributes_categories.destroy', $attribute_category) }}" class="btn btn-danger js-delete">Удалить</button>
+                                        <a href="{{ route('admin.attributes_categories.edit', [$model, $attribute_category]) }}" class="btn btn-success">Изменить</a>
+                                        <button type="button" data-action="{{ route('admin.attributes_categories.destroy', [$model, $attribute_category]) }}" class="btn btn-danger js-delete">Удалить</button>
                                     </div>
                                 </td>
                             </tr>
@@ -39,8 +39,4 @@
             </div>
         </div>
     </div>
-<<<<<<< HEAD
 @stop
-=======
-@stop
->>>>>>> c2cae19... Attributes categories

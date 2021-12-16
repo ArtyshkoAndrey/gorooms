@@ -45,10 +45,7 @@ class RoomController extends Controller
 
     $rooms = $hotel->rooms()->get()->sortBy('order');
     $costTypes = CostType::all();
-    $attribute_categories = AttributeCategory::with(['attributes' => function ($q) {
-      $q->whereModel(Room::class)->get();
-    }])
-      ->get();
+    $attribute_categories = AttributeCategory::all();
     if ($hotel->type_fond === Hotel::ROOMS_TYPE) {
       return view('lk.room.edit-rooms', compact('hotel', 'rooms', 'costTypes', 'attribute_categories'));
     }

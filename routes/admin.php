@@ -20,16 +20,56 @@ Route::get('/rooms/create/{hotel}', 'RoomController@create')->name('rooms.create
 Route::get('/rooms/block/{hotel}', 'HotelController@block')->name('hotels.block');
 Route::get('/rooms/unblock/{hotel}', 'HotelController@unblock')->name('hotels.unblock');
 
-Route::get('/attributes/{category}', 'AttributeController@index')
-    ->name('attributes.index')
-    ->where('category', '(room|hotel)');
+// Route::get('/attributes/{category}', 'AttributeController@index')
+//     ->name('attributes.index')
+//     ->where('category', '(room|hotel)');
 
 
 // Route::resource('attributes', 'AttributeController', [
 //     'except' => ['index'],
 // ]);
-Route::resource('attributes', 'AttributeController');
-Route::resource('attributes_categories', 'AttributeCategoryController');
+// Route::resource('attributes', 'AttributeController');
+
+Route::get('/attributes/{model}/create', 'AttributeController@create')
+  ->name('attributes.create')
+  ->where('model', '(room|hotel)');
+Route::get('/attributes/{model}', 'AttributeController@index')
+  ->name('attributes.index')
+  ->where('model', '(room|hotel)');
+Route::get('/attributes/{model}/edit/{attribute}', 'AttributeController@edit')
+  ->name('attributes.edit')
+  ->where('model', '(room|hotel)');
+Route::put('/attributes/{model}/update/{attribute}', 'AttributeController@update')
+  ->name('attributes.update')
+  ->where('model', '(room|hotel)');
+Route::delete('/attributes/{model}/destroy/{attribute}', 'AttributeController@destroy')
+  ->name('attributes.destroy')
+  ->where('model', '(room|hotel)');
+Route::post('/attributes/{model}/store', 'AttributeController@store')
+  ->name('attributes.store')
+  ->where('model', '(room|hotel)');
+
+
+Route::get('/attributes_categories/{model}/create', 'AttributeCategoryController@create')
+->name('attributes_categories.create')
+->where('model', '(room|hotel)');
+Route::get('/attributes_categories/{model}', 'AttributeCategoryController@index')
+  ->name('attributes_categories.index')
+  ->where('model', '(room|hotel)');
+Route::get('/attributes_categories/{model}/edit/{attributesCategory}', 'AttributeCategoryController@edit')
+->name('attributes_categories.edit')
+->where('model', '(room|hotel)');
+Route::put('/attributes_categories/{model}/update/{attributesCategory}', 'AttributeCategoryController@update')
+->name('attributes_categories.update')
+->where('model', '(room|hotel)');
+Route::delete('/attributes_categories/{model}/destroy/{attributesCategory}', 'AttributeCategoryController@destroy')
+->name('attributes_categories.destroy')
+->where('model', '(room|hotel)');
+Route::post('/attributes_categories/{model}/store', 'AttributeCategoryController@store')
+->name('attributes_categories.store')
+->where('model', '(room|hotel)');
+
+
 
 Route::resource('hotels/{hotel?}/categories', 'CategoryController', [
   'except' => ['index'],

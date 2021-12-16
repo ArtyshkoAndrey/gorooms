@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="h2">Редактирование категории атрибута</div>
-        <form class="row" action="{{ route('admin.attributes_categories.update', $attributesCategory) }}" method="POST" enctype="multipart/form-data">
+        <form class="row" action="{{ route('admin.attributes_categories.update', [$model, $attributesCategory]) }}" method="POST" enctype="multipart/form-data">
             @method('PUT')
             @csrf
             <div class="col-8">
@@ -15,8 +15,4 @@
             </div>
         </form>
     </div>
-<<<<<<< HEAD
 @stop
-=======
-@stop
->>>>>>> c2cae19... Attributes categories

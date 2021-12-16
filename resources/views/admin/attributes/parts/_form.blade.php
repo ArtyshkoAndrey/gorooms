@@ -11,35 +11,11 @@
 @endif
 <div class="form-group">
     <label for="model">Категория</label>
-<<<<<<< HEAD
-    <select name="attribute_category_id" id="attribute_category_id" class="form-control">
-        <option value="">Выберите категорию</option>
-        @foreach($attributeCategories AS $attribute_category)
-            <option value="{{ $attribute_category->id }}" @if(isset($attribute) && $attribute->attribute_category_id === $attribute_category->id) selected @endif>{{ $attribute_category->name }}</option>
-        @endforeach
-    </select>
-</div>
-<div class="form-group">
-    <label for="model">Тип</label>
-    <select name="model" id="model" class="form-control">
-        <option value="">Выберите тип</option>
-        @foreach(\App\Models\Attribute::MODELS AS $model => $title)
-            <option value="{{ $model }}" @if(isset($attribute) && $attribute->model_name === $model) selected @endif>{{ $title }}</option>
-        @endforeach
-=======
     <select name="attribute_category_id" class="form-control">
         <option value="">Выберите категорию</option>
-        <optgroup label="Отели">
-            @foreach($hotel_categories AS $model)
-                <option value="{{ $model->id }}" @if(isset($attribute) && $attribute->attribute_category_id === $model->id) selected @endif>{{ $model->name }}</option>
-            @endforeach
-        </optgroup>
-        <optgroup label="Комнаты">
-            @foreach($room_categories AS $model)
-                <option value="{{ $model->id }}" @if(isset($attribute) && $attribute->attribute_category_id === $model->id) selected @endif>{{ $model->name }}</option>
-            @endforeach
-        </optgroup>
->>>>>>> c2cae19... Attributes categories
+        @foreach($categories AS $model)
+            <option value="{{ $model->id }}" @if(isset($attribute) && $attribute->attribute_category_id === $model->id) selected @endif>{{ $model->name }}</option>
+        @endforeach
     </select>
 </div>
 <div class="form-group">

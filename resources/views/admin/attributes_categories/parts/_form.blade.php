@@ -8,17 +8,6 @@
 </div>
 @if (optional(@$attributesCategory)->id)
     <input type="hidden" name="id" value="{{ $attributesCategory->id }}">
-<<<<<<< HEAD
 @endif
-=======
-@endif
-<div class="form-group">
-    <label for="model">Тип категории</label>
-    <select name="model_type" id="model" class="form-control">
-        <option value="">Выберите категорию</option>
-        @foreach(\App\Models\AttributeCategory::TYPES AS $model => $title)
-            <option value="{{ $model }}" @if(isset($attributesCategory) && $attributesCategory->model_type === $model) selected @endif>{{ $title }}</option>
-        @endforeach
-    </select>
-</div>
->>>>>>> c2cae19... Attributes categories
+<input type="hidden" name="model_type" value="App\Models\{{ ucfirst($model) }}">
+

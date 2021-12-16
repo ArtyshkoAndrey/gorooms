@@ -84,14 +84,10 @@ class ObjectController extends Controller
   public function edit()
   {
     $hotel = auth()->user()->personal_hotel;
-    $attributes = Attribute::where('model', Hotel::class)
-      ->orWhereNull('model')->get();
+    $attributes = Attribute::forHotels()->get();
     $hotelTypes = HotelType::orderBy('sort')
       ->get();
-    $attributeCategories = AttributeCategory::with(['attributes' => function ($q) {
-        $q->whereModel(Hotel::class)->get();
-      }])
-      ->get();
+    $attributeCategories = AttributeCategory::all();
     return view('lk.object.edit',
       compact('hotel',
         'attributeCategories',

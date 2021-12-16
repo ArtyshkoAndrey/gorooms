@@ -7,6 +7,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\Attribute
@@ -65,5 +66,22 @@ class Attribute extends Model
   public function scopeFiltered(Builder $builder)
   {
     return $builder->where('in_filter', '=', true);
+  }
+
+  public function scopeFilteredByModel(Builder $builder, string $model_type)
+  {
+    return $builder->whereIn('attribute_category_id', function ($query) use($model_type) {
+      $query->select('id')->from(with(new AttributeCategory())->getTable())->where("model_type", AttributeCategory::TYPES[$model_type]);
+    });
+  }
+
+  public function scopeJoinCategoryName(Builder $builder)
+  {
+    return $builder->select("attributes.*")->addSelect("attribute_categories.name AS category_name")->leftJoin("attribute_categories", "attributes.attribute_category_id", "=", "attribute_categories.id");
+  }
+
+  public function attributeCategory(): BelongsTo
+  {
+    return $this->belongsTo(AttributeCategory::class);
   }
 }

@@ -17,10 +17,10 @@ class AttributeCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): View
+    public function index(string $model): View
     {
-        $attribute_categories = AttributeCategory::paginate(20);
-        return view('admin.attributes_categories.index', compact('attribute_categories'));
+        $attribute_categories = AttributeCategory::filteredByModel($model)->paginate(20);
+        return view('admin.attributes_categories.index', compact('attribute_categories', 'model'));
     }
 
     /**
@@ -28,9 +28,9 @@ class AttributeCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(): View
+    public function create(string $model): View
     {
-        return view('admin.attributes_categories.create');
+        return view('admin.attributes_categories.create', compact('model'));
     }
 
     /**
@@ -39,27 +39,28 @@ class AttributeCategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, $model): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'model_type' => 'required',
         ]);
 
-        $attributeCategory = AttributeCategory::create($validated);
+        AttributeCategory::create($validated);
 
-        return redirect()->route('admin.attributes_categories.index')->with('success');
+        return redirect()->route('admin.attributes_categories.index', $model)->with('success');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
+     * @param  string  $model
      * @param  \App\Models\AttributeCategory  $attributesCategory
      * @return \Illuminate\Http\Response
      */
-    public function edit(AttributeCategory $attributesCategory): View
+    public function edit(string $model, AttributeCategory $attributesCategory): View
     {
-        return view('admin.attributes_categories.edit', compact('attributesCategory'));
+        return view('admin.attributes_categories.edit', compact('model', 'attributesCategory'));
     }
 
     /**
@@ -69,7 +70,7 @@ class AttributeCategoryController extends Controller
      * @param  \App\Models\AttributeCategory  $attributesCategory
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, AttributeCategory $attributesCategory): RedirectResponse
+    public function update(Request $request, string $model, AttributeCategory $attributesCategory): RedirectResponse
     {
 
         $validated = $request->validate([
@@ -79,7 +80,7 @@ class AttributeCategoryController extends Controller
 
         $attributesCategory->update($validated);
 
-        return redirect()->route('admin.attributes_categories.index');
+        return redirect()->route('admin.attributes_categories.index', $model);
     }
 
 
@@ -89,9 +90,9 @@ class AttributeCategoryController extends Controller
      * @param  \App\Models\AttributeCategory  $attributesCategory
      * @return \Illuminate\Http\Response
      */
-    public function destroy(AttributeCategory $attributesCategory): RedirectResponse
+    public function destroy($model, AttributeCategory $attributesCategory): RedirectResponse
     {
         $attributesCategory->delete();
-        return redirect()->route('admin.attributes_categories.index');
+        return redirect()->route('admin.attributes_categories.index', $model);
     }
 }

@@ -73,7 +73,7 @@ class RoomController extends Controller
 
     public function edit(Room $room): View
     {
-        $attributes = Attribute::where('model', Room::class)->orWhereNull('model')->get();
+        $attributes = Attribute::forRooms()->get();
         $costTypes = CostType::orderBy('sort')->get();
         return view('admin.room.edit', compact('room', 'attributes', 'costTypes'));
     }

@@ -28,9 +28,7 @@ class RoomController extends Controller
     $rooms = $hotel->rooms;
 
     $costTypes = CostType::all();
-    $attribute_categories = AttributeCategory::with(['attributes' => function ($q) {
-      $q->whereModel(Room::class)->get();
-    }])->get();
+    $attribute_categories = AttributeCategory::forRooms()->get();
 
     if ($hotel->type_fond === Hotel::ROOMS_TYPE) {
       return view('moderator.room.edit-rooms', compact('rooms', 'hotel', 'costTypes', 'attribute_categories'));
