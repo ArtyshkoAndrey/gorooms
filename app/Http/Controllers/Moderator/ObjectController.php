@@ -42,14 +42,10 @@ class ObjectController extends Controller
     try {
       $hotel = Hotel::findOrFail($id);
 
-      $attributes = Attribute::where('model', Hotel::class)
-        ->orWhereNull('model')->get();
+      $attributes = Attribute::forHotels()->get();
       $hotelTypes = HotelType::orderBy('sort')
         ->get();
-      $attributeCategories = AttributeCategory::with(['attributes' => function ($q) {
-        $q->whereModel(Hotel::class)->get();
-      }])
-        ->get();
+      $attributeCategories = AttributeCategory::forHotels()->get();
 
       return view('moderator.object.edit', compact('hotel', 'attributes', 'attributeCategories', 'hotelTypes'));
     } catch (ModelNotFoundException $e) {

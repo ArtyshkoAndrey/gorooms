@@ -7,6 +7,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\Attribute
@@ -41,26 +42,25 @@ class Attribute extends Model
 {
   use CreatedAtOrdered;
 
-  public const MODELS = [
-    Hotel::class => 'Отели',
-    Room::class => 'Номера',
-  ];
   protected $fillable = [
     'name',
     'description',
-    'model',
     'attribute_category_id',
     'in_filter'
   ];
 
   public function scopeForHotels(Builder $builder)
   {
-    return $builder->where('model', '=', Hotel::class);
+    return $builder->whereIn('attribute_category_id', function($query) {
+      $query->select('id')->from(with(new AttributeCategory())->getTable())->where("model_type", Hotel::class) ;
+    });
   }
 
   public function scopeForRooms(Builder $builder)
   {
-    return $builder->where('model', '=', Room::class);
+    return $builder->whereIn('attribute_category_id', function ($query) {
+      $query->select('id')->from(with(new AttributeCategory())->getTable())->where("model_type", Room::class);
+    });
   }
 
   public function scopeFiltered(Builder $builder)
@@ -68,21 +68,20 @@ class Attribute extends Model
     return $builder->where('in_filter', '=', true);
   }
 
-  public function getModelAttribute($value)
+  public function scopeFilteredByModel(Builder $builder, string $model_type)
   {
-    return self::MODELS[$value];
+    return $builder->whereIn('attribute_category_id', function ($query) use($model_type) {
+      $query->select('id')->from(with(new AttributeCategory())->getTable())->where("model_type", AttributeCategory::TYPES[$model_type]);
+    });
   }
 
-  public function getCategoryAttribute()
+  public function scopeJoinCategoryName(Builder $builder)
   {
-    $model = explode('\\', $this->getModelNameAttribute());
-    $model = end($model);
-    $model = mb_strtolower($model);
-    return $model;
+    return $builder->select("attributes.*")->addSelect("attribute_categories.name AS category_name")->leftJoin("attribute_categories", "attributes.attribute_category_id", "=", "attribute_categories.id");
   }
 
-  public function getModelNameAttribute()
+  public function attributeCategory(): BelongsTo
   {
-    return $this->getAttributes()['model'];
+    return $this->belongsTo(AttributeCategory::class);
   }
 }

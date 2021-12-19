@@ -158,7 +158,7 @@
                                             <li class="advanced-search-prices-item">
                                                 @php($value = $type.'.between.'.Settings::option($type.'_cost_small').'-'.Settings::option($type.'_cost_low'))
                                                 <input id="advanced-search-prices-{{ $loop->index }}-3" name="cost" type="radio" class="checkbox" value="{{$value}}" @checked($value, optional($request)->get('cost')) >
-                                                <label for="advanced-search-prices-{{ $loop->index }}-3" class="checkbox-label checkbox-label-orange">{{ Settings::option($type.'_cost_medium') }} р. - {{ Settings::option($type.'_cost_low') }}
+                                                <label for="advanced-search-prices-{{ $loop->index }}-3" class="checkbox-label checkbox-label-orange">{{ Settings::option($type.'_cost_small') }} р. - {{ Settings::option($type.'_cost_low') }}
                                                     р</label>
                                             </li>
                                             <li class="advanced-search-prices-item">
@@ -304,17 +304,7 @@
                     @endforeach
                 </div>
                 <div class="search-bottom">
-                   <!-- <div class="search-dates">
-                        <div class="form-group-date">
-                            <p class="form-group-date-label">Заезд:</p>
-                            <input id="search-from-date" type="date" class="form-control form-control-date" placeholder="10.06.2020">
-                            <input id="search-from-time" type="text" class="form-control form-control-time js-time" placeholder="14:00">
-                        </div>
-                        <div class="form-group-date">
-                            <p class="form-group-date-label">Выезд:</p>
-                            <input id="search-to-date" type="date" class="form-control form-control-date" placeholder="10.06.2020">
-                            <input id="search-to-time" type="text" class="form-control form-control-time js-time" placeholder="14:00">
-                        </div>-->
+          
                     </div>
                     <button id="js-advanced-search-open-btn" class="advanced-search-btn advanced-search-btn-open">
                         Расширеный поиск

@@ -34,11 +34,18 @@ use Illuminate\Support\Carbon;
  */
 class AttributeCategory extends Model
 {
+  public const TYPES = [
+    'hotel' => Hotel::class,
+    'room' => Room::class,
+  ];
+  
+
   /**
    * @var string[]
    */
   protected $fillable = [
-    'name'
+    'name',
+    'model_type',
   ];
 
   /**
@@ -49,5 +56,20 @@ class AttributeCategory extends Model
   public function attributes(): HasMany
   {
     return $this->hasMany(Attribute::class);
+  }
+
+  public function scopeFilteredByModel(Builder $builder, string $model_type)
+  {
+    return $builder->where('model_type', '=', self::TYPES[$model_type]);
+  }
+
+  public function scopeForHotels(Builder $builder)
+  {
+    return $builder->where('model_type', '=', self::TYPES['hotel']);
+  }
+
+  public function scopeForRooms(Builder $builder)
+  {
+    return $builder->where('model_type', '=', self::TYPES['room']);
   }
 }

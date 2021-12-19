@@ -5,8 +5,8 @@
         <div class="card">
             <div class="card-header">
                 <div class="d-flex w-100 justify-content-between align-items-center">
-                    <div class="h4 p-0 m-0">Список атрибутов для {{ $category === 'room' ? 'номеров' : 'отелей' }}</div>
-                    <a href="{{ route('admin.attributes.create') }}" class="btn btn-primary btn-sm">Новый атрибут</a>
+                    <div class="h4 p-0 m-0">Список атрибутов</div>
+                    <a href="{{ route('admin.attributes.create', $model) }}" class="btn btn-primary btn-sm">Новый атрибут</a>
                 </div>
             </div>
             <div class="card-body">
@@ -16,6 +16,7 @@
                         <tr>
                             <th>#</th>
                             <th>Наименование</th>
+                            <th>Категория</th>
                             <th>Описание</th>
                             <th>Действия</th>
                         </tr>
@@ -25,11 +26,12 @@
                             <tr>
                                 <td>{{ $attribute->id }}</td>
                                 <td>{{ $attribute->name }}</td>
+                                <td>{{ $attribute->attributeCategory->name }}</td>
                                 <td>{{ $attribute->description }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.attributes.edit', $attribute) }}" class="btn btn-success">Изменить</a>
-                                        <button type="button" data-action="{{ route('admin.attributes.destroy', $attribute) }}" class="btn btn-danger js-delete">Удалить</button>
+                                        <a href="{{ route('admin.attributes.edit', [$model, $attribute]) }}" class="btn btn-success">Изменить</a>
+                                        <button type="button" data-action="{{ route('admin.attributes.destroy', [$model, $attribute]) }}" class="btn btn-danger js-delete">Удалить</button>
                                     </div>
                                 </td>
                             </tr>
@@ -37,6 +39,7 @@
                         </tbody>
                     </table>
                 </div>
+                {{ $attributes->render() }}
             </div>
         </div>
     </div>

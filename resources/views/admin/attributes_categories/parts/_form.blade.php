@@ -9,3 +9,5 @@
 @if (optional(@$attributesCategory)->id)
     <input type="hidden" name="id" value="{{ $attributesCategory->id }}">
 @endif
+<input type="hidden" name="model_type" value="App\Models\{{ ucfirst($model) }}">
+

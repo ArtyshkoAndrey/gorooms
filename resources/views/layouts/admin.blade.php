@@ -52,14 +52,17 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route('admin.attributes_categories.index') }}">
-                                Категории атрибутов
-                            </a>
                             <a class="dropdown-item" href="{{ route('admin.attributes.index', 'room') }}">
-                                Номера
+                                Атрибуты комнат
                             </a>
                             <a class="dropdown-item" href="{{ route('admin.attributes.index', 'hotel') }}">
-                                Отели
+                                Атрибуты отелей
+                            </a>
+                            <a class="dropdown-item" href="{{ route('admin.attributes_categories.index' , 'room') }}">
+                                Категории атрибутов для комнат
+                            </a>
+                            <a class="dropdown-item" href="{{ route('admin.attributes_categories.index' , 'hotel') }}">
+                                Категории атрибутов для отелей
                             </a>
                         </div>
                     </li>

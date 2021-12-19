@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AttributeRequest;
-use App\Models\Attribute;
-use App\Models\AttributeCategory;
+use App\Models\{AttributeCategory, Attribute, Hotel, Room};
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AttributeController extends Controller
@@ -17,15 +15,11 @@ class AttributeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(string $category = null): View
+    public function index(string $model): View
     {
-        if ($category === 'room')
-            $attributes = Attribute::forRooms()->get();
-        elseif ($category === 'hotel')
-            $attributes = Attribute::forHotels()->get();
-        else
-            abort(404);
-        return view('admin.attributes.index', compact('attributes', 'category'));
+        $attributes = Attribute::filteredByModel($model)->joinCategoryName()->orderBy('category_name')->paginate(20);
+
+        return view('admin.attributes.index', compact('attributes', 'model'));
     }
 
     /**
@@ -33,11 +27,11 @@ class AttributeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(): View
+    public function create(string $model): View
     {
-        $attributeCategories = AttributeCategory::all();
+        $categories = AttributeCategory::filteredByModel($model)->get();
 
-        return view('admin.attributes.create', compact('attributeCategories'));
+        return view('admin.attributes.create', compact('categories', 'model'));
     }
 
     /**
@@ -46,11 +40,11 @@ class AttributeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(AttributeRequest $request): RedirectResponse
+    public function store(AttributeRequest $request, string $model): RedirectResponse
     {
         $validated = $request->validated();
         $attribute = Attribute::create($validated);
-        return redirect()->route('admin.attributes.index', $attribute->category)->with('success', true);
+        return redirect()->route('admin.attributes.index', $model)->with('success', true);
     }
 
     /**
@@ -59,9 +53,9 @@ class AttributeController extends Controller
      * @param  \App\Models\Attribute  $attribute
      * @return \Illuminate\Http\Response
      */
-    public function show(Attribute $attribute): View
+    public function show(string $model, Attribute $attribute): View
     {
-        return view('admin.attributes.show', compact('attribute'));
+        return view('admin.attributes.show', compact('attribute', 'model'));
     }
 
     /**
@@ -70,11 +64,11 @@ class AttributeController extends Controller
      * @param  \App\Models\Attribute  $attribute
      * @return \Illuminate\Http\Response
      */
-    public function edit(Attribute $attribute): View
+    public function edit(string $model, Attribute $attribute): View
     {
-        $attributeCategories = AttributeCategory::all();
-        
-        return view('admin.attributes.edit', compact('attribute', 'attributeCategories'));
+        $categories = AttributeCategory::filteredByModel($model)->get();
+
+        return view('admin.attributes.edit', compact('attribute', 'categories', 'model'));
     }
 
     /**
@@ -84,12 +78,12 @@ class AttributeController extends Controller
      * @param  \App\Models\Attribute  $attribute
      * @return \Illuminate\Http\Response
      */
-    public function update(AttributeRequest $request, Attribute $attribute): RedirectResponse
+    public function update(AttributeRequest $request, string $model, Attribute $attribute): RedirectResponse
     {
         $validated = $request->validated();
         $attribute->fill($validated);
         $attribute->save();
-        return redirect()->route('admin.attributes.index', $attribute->category);
+        return redirect()->route('admin.attributes.index', $model);
     }
 
     /**
@@ -98,10 +92,9 @@ class AttributeController extends Controller
      * @param  \App\Models\Attribute  $attribute
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Attribute $attribute): RedirectResponse
+    public function destroy(string $model, Attribute $attribute): RedirectResponse
     {
-        $category = $attribute->category;
         $attribute->delete();
-        return redirect()->route('admin.attributes.index', $category);
+        return redirect()->route('admin.attributes.index', $model);
     }
 }
