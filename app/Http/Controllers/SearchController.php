@@ -246,7 +246,7 @@ class SearchController extends Controller
     }
 
     if ($request->is('api/*')) {
-      return Json::good(['count' => $count]);
+      return Json::good(['count' => $count, 'is_room' => $is_room]);
     }
 
     /* START SEO */
@@ -614,6 +614,14 @@ class SearchController extends Controller
 
   public function address(Request $request, $city, $param1 = null, $param2 = null, $param3 = null, $param4 = null)
   {
+    $sortByRequested = [
+      'sortByCost' => false,
+    ];
+
+    if ($request->has('sortByCost')) {
+      $sortByRequested['sortByCost'] = $orderCost = $request->input('sortByCost');
+    }
+
     $slugs = [];
 
     $findParam = function ($param) use ($param1, $param2, $param3, $param4) {
@@ -674,7 +682,7 @@ class SearchController extends Controller
       $address['short_area'] = Area::short($address['area']);
     }
 
-    return view(isset($request["page"]) ? 'web.search_' : 'web.search', compact('hotels', 'query', 'rooms', 'with_map', 'title', 'attributes', 'address', 'request'));
+    return view(isset($request["page"]) ? 'web.search_' : 'web.search', compact('sortByRequested', 'hotels', 'query', 'rooms', 'with_map', 'title', 'attributes', 'address', 'request'));
   }
 }
 
