@@ -29,7 +29,7 @@
     <meta property="og:title" content="{{ $pageAbout->title ?? '' }}"/>
     <meta property="og:description" content="{{ $pageAbout->meta_description ?? ''}}"/>
     <meta property="og:url" content="https://gorooms.ru{{ $pageAbout->url ?? '' }}"/>
-    <meta property="og:image" content="https://gorooms.ru/img/logo.svg"/>
+    <meta property="og:image" content="https://gorooms.ru/img/logo_new.svg"/>
     <meta property="og:site_name" content="https://gorooms.ru/"/>    @if($hotel->meta_keywords)
       <link rel="canonical" href="{{ $hotel->meta_keywords }}"/>
     @endif
@@ -90,11 +90,11 @@
     <div class="container header-top-container">
       @if(is_null(\Route::getCurrentRoute()->getName()))
         <div class="header-logo">
-          <img src="{{ asset('img/logo.svg') }}" alt="" class="header-logo-img">
+          <img src="{{ asset('img/logo_new.svg') }}" alt="" class="header-logo-img">
         </div>
       @else
         <a href="/" class="header-logo">
-          <img src="{{ asset('img/logo.svg') }}" alt="" class="header-logo-img">
+          <img src="{{ asset('img/logo_new.svg') }}" alt="" class="header-logo-img">
         </a>
       @endif
       <div class="header-top-btns">
