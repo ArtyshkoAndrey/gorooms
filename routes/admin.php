@@ -50,12 +50,12 @@ Route::post('/attributes/{model}/store', 'AttributeController@store')
   ->where('model', '(room|hotel)');
 
 
-Route::get('/attributes_categories/{model}/create', 'AttributeCategoryController@create')
-->name('attributes_categories.create')
-->where('model', '(room|hotel)');
 Route::get('/attributes_categories/{model}', 'AttributeCategoryController@index')
   ->name('attributes_categories.index')
   ->where('model', '(room|hotel)');
+Route::get('/attributes_categories/{model}/create', 'AttributeCategoryController@create')
+->name('attributes_categories.create')
+->where('model', '(room|hotel)');
 Route::get('/attributes_categories/{model}/edit/{attributesCategory}', 'AttributeCategoryController@edit')
 ->name('attributes_categories.edit')
 ->where('model', '(room|hotel)');
