@@ -40,7 +40,7 @@ class RoomObserver
     }
     $hotel->save();
 
-      $this->moderate_hotel($hotel);
+    $this->moderate_hotel($hotel);
   }
 
   /**
@@ -76,9 +76,7 @@ class RoomObserver
       $hotel->save();
     }
 
-//    if (Route::currentRouteNamed('lk.*')) {
-      $this->moderate_hotel($hotel);
-//    }
+    $this->moderate_hotel($hotel);
   }
 
   /**

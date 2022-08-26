@@ -68,7 +68,11 @@ class ObjectController extends Controller
 
       Auth::loginUsingId($user->id, true);
     }
-    $user->notify(new NotificationCreateHotel($user, $request->password));
+    try {
+      $user->notify(new NotificationCreateHotel($user, $request->password));
+    } catch (\Swift_TransportException $e) {
+      \Log::error($e->getMessage());
+    }
     $hotel = new Hotel();
     $hotel->name = $request->get('hotel')['name'];
     $hotel->type()->associate($request->get('hotel')['type']);
